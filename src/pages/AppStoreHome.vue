@@ -3,12 +3,12 @@
         <div slot="header" class="header">
             <div class="search-home" @click="goToSearchPage">
                 <div class="search-home-content">
-                    <x-icon type="ios-search" size="15" class="search-home-icon"></x-icon>
+                    <x-icon type="ios-search" size="18" class="search-home-icon"></x-icon>
                     <marquee ref="hotWords"><marquee-item v-for="item in hotWords" :key="item.id">{{item.searchWord}}</marquee-item></marquee>
                 </div>
             </div>
-            <grid class="category" v-if="homeData">
-                <grid-item  v-for="item in homeData.navbars"
+            <grid class="category" v-if="navBars.length">
+                <grid-item  v-for="item in navBars"
                             :link="categoryMap[item.type]"
                             :key="item.id">
                     <img class="category-icon" slot="icon" :src="item.iconUrl">
@@ -21,15 +21,17 @@
                     ref="scroller"
                     :on-refresh="refresh"
                     :on-infinite="getMore"
-                    v-if="homeData">
-                <div class="list-item" v-for="item in homeData.apps" :key="item.id">
-                    <router-link :to="{name: 'AppDetail', params:{appId: item.id}, query: {isSub: true}}" class="list-item-icon-c">
-                        <img class="list-item-icon" :src="item.iconUrl">
-                    </router-link>
-                    <router-link :to="{path: 'appDetail/'+ item.id, query: {isSub: true}}">
-                        <div class="list-item-name">{{item.name}}</div>
-                        <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
-                        <div class="list-item-brief">{{item.brief}}</div>
+                    v-if="apps.length">
+                <div class="list-item" v-for="item in apps" :key="item.id">
+                    <router-link class="list-item-c" :to="{name: 'AppDetail', params:{appId: item.id}, query: {isSub: true}}">
+                        <div class="list-item-icon-c">
+                            <img class="list-item-icon" :src="item.iconUrl">
+                        </div>
+                        <div>
+                            <div class="list-item-name">{{item.name}}</div>
+                            <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
+                            <div class="list-item-brief">{{item.brief}}</div>
+                        </div>
                     </router-link>
                     <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                 </div>
@@ -52,7 +54,6 @@
 
 <script>
     import {Grid, GridItem, ViewBox, XImg, Marquee, MarqueeItem} from 'vux'
-    import isEqual from 'lodash/isEqual'
     import {formatSize} from '../filters'
     import {fetchHome, fetchSearchHotWords} from '../services/appStore'
     import BtnDownload from '../components/btn-download'
@@ -64,40 +65,36 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                homeData: null,
+                navBars: [],
+                apps: [],
                 hotWords:[],
                 showFooter: true,
                 loading:false,
-                notEnd: true,
                 categoryMap:{
-                    need: {name: 'AppStoreCategory', append:false, params:{type: 'need'}},
-                    rank: {name: 'AppStoreCategory', append:false, params:{type: 'rank'}},
-                    game: {name: 'AppStoreCategory', append:false, params:{type: 'game'}},
-                    category: {name: 'AppStoreCategory', append:false, params:{type: 'category'}},
-                }
+                    need: {name: 'AppStoreApps', append:false, params:{type: 'need', title:'装机必备'}},
+                    rank: {name: 'AppStoreApps', append:false, params:{type: 'rank', title:'下载榜单'}},
+                    game: {name: 'AppStoreApps', append:false, params:{type: 'game', title:'热门游戏'}},
+                    category: {name: 'AppStoreCategory', append:false},
+                },
+                title: '应用市场'
             }
         },
-        computed: {
-        },
         created(){
-            document.title = '应用市场';
-            this.getHomeData().then(
-                this.getHotWords()
-            )
+            this.getHomeData().then(this.getHotWords)
+        },
+        beforeRouteEnter (to, from, next) {
+            document.title = to.meta.title
+            next()
         },
         methods: {
             refresh(done) {
-                this.queryData.pageSize = 10
-                this.getHomeData(done)
+                this.queryData.pageIndex = 1
+                !this.loading && this.getHomeData(done)
             },
             getMore(done) {
-                this.queryData.pageSize += 10;
-                if(!this.loading) {
-                    this.getHomeData(done).then(res => {
-                        this.notEnd = !isEqual({...this.homeData}, {...res.data})
-                        !this.notEnd && this.$refs['scroller'].finishInfinite(true)
-                    })
-                }
+                this.queryData.pageIndex ++;
+                console.log(this.queryData.pageIndex)
+                !this.loading && this.getHomeData(done)
             },
             getHomeData(done) {
                 this.loading = true;
@@ -106,9 +103,22 @@
                     if(typeof done === 'function'){
                         done()
                     }
-                    if(res.code === '0') {
-                        this.homeData = res.data
+                    if(res.code === '0' && res.data) {
+                        if(res.data.navbars) {
+                            this.navBars = res.data.navbars
+                        }
+                        if(res.data.apps && res.data.apps.length) {
+                            this.apps = [...this.apps, ...res.data.apps]
+                        } else {
+                            this.$refs['scroller'].finishInfinite(true)
+                        }
                     }
+                }, () => {
+                    this.loading = false
+                    if(typeof done === 'function') {
+                        done()
+                    }
+                    this.$vux.toast.text('获取数据失败', 'bottom')
                 })
             },
             getHotWords() {
@@ -153,6 +163,7 @@
     flex-direction: column;
     .header{
         background: #fff;
+        flex-shrink: 0;
     }
     .scroll-c{
         -webkit-box-sizing: border-box;
@@ -185,21 +196,24 @@
     }
     //---
     .list-home{
+        height: 100%;
         position: relative;
         flex: 1;
     }
     .list-item{
         position: relative;
-        display: flex;
-        align-items: center;
-        padding: 0 13px;
-        box-sizing: border-box;
         & + .list-item {
             margin-top: 27px;
         }
         &:active {
             background-color: #eee;
         }
+    }
+    .list-item-c {
+        display: flex;
+        align-items: center;
+        padding: 0 13px;
+        box-sizing: border-box;
     }
     .list-item-icon-c{
         width: 75px;

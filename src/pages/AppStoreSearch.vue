@@ -1,7 +1,7 @@
 <template>
     <div class="search-page">
         <div class="header">
-            <x-icon class="header-icon" type="ios-arrow-left" size="22" @click.native="$router.go(-1)"></x-icon>
+            <x-icon class="header-icon" type="ios-arrow-left" size="25" @click.native="$router.go(-1)"></x-icon>
             <div class="search-input-c">
                 <input id="search-input" type="text" class="search-input" v-model="queryData.query" :placeholder="hotWord">
                 <label v-show="queryData.query" @click="queryData.query = ''" for="search-input">
@@ -12,19 +12,22 @@
         </div>
         <main class="main">
             <!--热门搜索-->
-            <div class="hot-words" v-if="hotWords.length && showHotWords && !queryData.query">
+            <div class="hot-words" v-if="hotWords.length && showHotWords && !queryData.query && !searchResult">
                 <div class="hot-word-title">热门搜索</div>
                 <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item.searchWord)">{{item.searchWord}}</div>
             </div>
             <!--match列表-->
             <div class="list-match" v-if="searchMatch">
-                <div v-if="searchMatch.data && searchMatch.data.app && searchMatch.data.app.id" class="list-item">
-                    <router-link :to="{name: 'AppDetail', append:false, params:{appId:searchMatch.data.app.id}, query: {isSub: true}}" class="list-item-icon-c">
-                        <img class="list-item-icon" :src="searchMatch.data.app.iconUrl">
-                    </router-link>
-                    <router-link :to="{name: 'AppDetail', append:false, params:{appId:searchMatch.data.app.id}, query: {isSub: true}}">
-                        <div class="list-item-name">{{searchMatch.data.app.name}}</div>
-                        <div class="list-item-brief">{{searchMatch.data.app.apkSize | formatSize(2)}}</div>
+                <div v-if="searchMatch.data && searchMatch.data.app && searchMatch.data.app.id"
+                     class="list-match-item">
+                    <router-link :to="{name: 'AppDetail', append:false, params:{appId:searchMatch.data.app.id}, query: {isSub: true}}" class="list-match-item-c">
+                        <div class="list-match-item-icon-c">
+                            <img class="list-match-item-icon" :src="searchMatch.data.app.iconUrl">
+                        </div>
+                        <div>
+                            <div class="list-match-item-name">{{searchMatch.data.app.name}}</div>
+                            <div class="list-match-item-brief">{{searchMatch.data.app.apkSize | formatSize(2)}}</div>
+                        </div>
                     </router-link>
                     <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl" btnText="下载"></btn-download>
                 </div>
@@ -47,13 +50,15 @@
                     :on-infinite="getMore"
                     v-if="searchResult">
                 <div class="list-item" v-for="item in searchResult.apps" :key="item.id">
-                    <router-link :to="{name: 'AppDetail',append:false, params:{appId: item.id}, query: {isSub: true}}" class="list-item-icon-c">
-                        <img class="list-item-icon" :src="item.iconUrl">
-                    </router-link>
-                    <router-link :to="{name: 'AppDetail',append:false, params:{appId: item.id}, query: {isSub: true}}">
-                        <div class="list-item-name">{{item.name}}</div>
-                        <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
-                        <div class="list-item-brief">{{item.brief}}</div>
+                    <router-link  :to="{name: 'AppDetail',append:false, params:{appId: item.id}, query: {isSub: true}}" class="list-item-c">
+                        <div class="list-item-icon-c">
+                            <img class="list-item-icon" :src="item.iconUrl">
+                        </div>
+                        <div>
+                            <div class="list-item-name">{{item.name}}</div>
+                            <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
+                            <div class="list-item-brief">{{item.brief}}</div>
+                        </div>
                     </router-link>
                     <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                 </div>
@@ -80,7 +85,8 @@
                 showHotWords: true,
                 searchMatch: {data: null},
                 searchResult: null,
-                loading: false
+                loading: false,
+                title: '应用搜索'
             }
         },
         props: {
@@ -111,8 +117,11 @@
             }
         },
         created(){
-            document.title = '应用市场';
             this.getHotWords()
+        },
+        beforeRouteEnter (to, from, next) {
+            document.title = to.meta.title
+            next()
         },
         methods: {
             getHotWords() {
@@ -218,6 +227,9 @@
             display: flex;
             align-items: center;
             flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+            border-bottom: 1px solid #d7d7d7;
             &:after {
                 content: '';
                 position: absolute;
@@ -265,6 +277,7 @@
         .main{
             flex: 1;
             position: relative;
+            overflow: auto;
         }
         //---
         .hot-words{
@@ -272,7 +285,6 @@
             font-size: 16px;
             color: #009def;
             background-color: #fff;
-            overflow: auto;
         }
         .hot-word-title{
             font-size: 21px;
@@ -287,11 +299,11 @@
         }
         //---
         .list-match{
-            height: 100%;
-            overflow: auto;
-            .list-item{
-                height: 60px;
+            .list-match-item{
                 position: relative;
+            }
+            .list-match-item-c{
+                height: 60px;
                 display: flex;
                 align-items: center;
                 box-sizing: border-box;
@@ -301,17 +313,17 @@
                     background-color: #eee;
                 }
             }
-            .list-item-icon-c{
+            .list-match-item-icon-c{
                 width: 40px;
                 height: 40px;
                 border-radius: 4px;
                 margin-right: 10px;
                 overflow: hidden;
             }
-            .list-item-icon{
+            .list-match-item-icon{
                 width: 100%;
             }
-            .list-item-name{
+            .list-match-item-name{
                 font-size: 16px;
                 color: @black;
                 white-space: nowrap;
@@ -319,7 +331,7 @@
                 text-overflow: ellipsis;
                 max-width: 200px;
             }
-            .list-item-brief{
+            .list-match-item-brief{
                 font-size: 11px;
                 color: @gray-dark;
                 white-space: nowrap;
@@ -352,16 +364,18 @@
         //---
         .list-result{
             .list-item{
-                height: 80px;
                 position: relative;
+                &:active {
+                    background-color: #eee;
+                }
+            }
+            .list-item-c {
+                height: 80px;
                 display: flex;
                 align-items: center;
                 box-sizing: border-box;
                 background: #fff;
                 padding: 0 20px;
-                &:active {
-                    background-color: #eee;
-                }
             }
             .list-item-icon-c{
                 width: 65px;

@@ -34,5 +34,8 @@
   #app {
     height: 100%;
     background: #fff;
+    .vux-header .vux-header-title{
+      font-size: 16px;
+    }
   }
 </style>

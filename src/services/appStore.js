@@ -21,6 +21,13 @@ export function fetchGame(data) {
         data
     })
 }
+export function fetchRank(data) {
+    return request({
+        url:'appstore/html/api/rank',
+        method: 'post',
+        data
+    })
+}
 export function fetchCategory(data) {
     return request({
         url:'appstore/html/api/category',
