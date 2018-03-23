@@ -3,7 +3,7 @@
         <x-header :left-options="{backText:''}">
             应用分类
             <router-link :to="{name: 'AppStoreSearch', append: false, params: {hotWord: hotword}}" slot="right">
-                <x-icon type="ios-search" size="23"></x-icon>
+                <x-icon type="ios-search" style="fill: #666" size="23"></x-icon>
             </router-link>
         </x-header>
         <main class="main">
@@ -14,7 +14,7 @@
                             :link="{name: 'AppStoreApps', append: false, params: {type: 'categoryList', title: item.typeName}, query: {catId: '-' + item.id}}"
                             class="list-item" v-for="item in list.game_cat"
                             :key="item.id">
-                        <div class="list-item-img-c"><img class="list-item-img" :src="item.icon"></div>
+                        <div class="list-item-img-c"><img class="list-item-img" v-lazy="item.icon"></div>
                         <span class="list-item-name">{{item.typeName}}</span>
                     </grid-item>
                 </grid>
@@ -24,7 +24,7 @@
                             :link="{name: 'AppStoreApps', append: false, params: {type: 'categoryList', title: item.typeName}, query: {catId: '-' + item.id}}"
                             class="list-item" v-for="item in list.app_cat"
                             :key="item.id">
-                        <div class="list-item-img-c"><img class="list-item-img" :src="item.icon"></div>
+                        <div class="list-item-img-c"><img class="list-item-img" v-lazy="item.icon"></div>
                         <span class="list-item-name">{{item.typeName}}</span>
                     </grid-item>
                 </grid>
@@ -103,16 +103,16 @@
         display: flex;
         flex-direction: column;
         .vux-header {
-            height: 45px;
             flex-shrink: 0;
-            &:after {
-                .setBottomLine(#c2c2c3)
-            }
+            background: #fff;
+            position: relative;
+            z-index: 2;
         }
         .main {
             height: 100%;
             flex: 1;
             overflow: auto;
+            -webkit-overflow-scrolling: touch;
         }
         //--
         .list-title {

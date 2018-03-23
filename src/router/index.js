@@ -7,6 +7,8 @@ const AppStoreHome = () => import('../pages/AppStoreHome.vue');
 const AppStoreSearch = () => import('../pages/AppStoreSearch.vue');
 const AppStoreCategory = () => import('../pages/AppStoreCategory.vue');
 const AppStoreApps = () => import('../pages/AppStoreApps.vue');
+const InformationList = () => import('../pages/InformationList.vue');
+const InformationDetail = () => import('../pages/InformationDetail.vue');
 import Lottery from '../components/Lottery.vue'
 
 const LotteryYuandan2017 = () => import('../components/Lottery-yuandan2017.vue');
@@ -45,6 +47,20 @@ export default new Router({
             path: '/AppDetail/:appId',
             name: 'AppDetail',
             component: AppDetail,
+            props: true
+        },
+        {
+            path: '/InformationList',
+            name: 'InformationList',
+            component: InformationList,
+            meta:{title: '热门资讯'},
+            props: true
+        },
+        {
+            path: '/InformationDetail/:id',
+            name: 'InformationDetail',
+            component: InformationDetail,
+            meta:{title: '资讯详情'},
             props: true
         },
         {

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <transition name="vux-fade">
+    <transition name="vux-fade" mode="out-in">
       <keep-alive :include="['app-store-search', 'app-store-home', 'app-store-category']">
         <router-view></router-view>
       </keep-alive>
@@ -34,8 +34,33 @@
   #app {
     height: 100%;
     background: #fff;
+    .vux-header {
+      padding: 0;
+      background-color: #fff;
+      height: 45px;
+      &:after {
+        .setBottomLine(#cacaca)
+      }
+    }
     .vux-header .vux-header-title{
       font-size: 16px;
+      height: 100%;
+      line-height: 45px;
+    }
+    .vux-header .vux-header-right{
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      top: 0;
+      width: 40px;
+    }
+    .vux-header .vux-header-right a, .vux-header .vux-header-right button{
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      margin: 0;
+      align-items: center;
     }
   }
 </style>

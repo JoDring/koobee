@@ -6,6 +6,13 @@ import router from './router'
 import Router from 'vue-router';
 import VueScroller from 'vue-scroller'
 Vue.use(VueScroller)
+import VueLazyload from 'vue-lazyload'
+Vue.use(VueLazyload, {
+    preLoad: 1.3,
+    error: 'static/images/palceholder-logo.png',
+    loading: 'static/images/palceholder-logo.png',
+    attempt: 1
+})
 import {AjaxPlugin, LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin} from 'vux';
 Vue.use(ConfigPlugin, {
     $layout: 'VIEW_BOX'
@@ -16,6 +23,8 @@ Vue.use(ToastPlugin);
 Vue.use(ConfirmPlugin);
 Vue.use(AlertPlugin);
 Vue.use(AjaxPlugin);
+const FastClick = require('fastclick')
+FastClick.attach(document.body)
 Vue.config.productionTip = false;
 /* eslint-disable no-new */
 new Vue({

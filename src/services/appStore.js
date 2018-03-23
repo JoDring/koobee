@@ -64,3 +64,18 @@ export function fetchSearchHotWords() {
         method: 'post'
     })
 }
+// 资讯
+export function fetchInformationList(data) {
+    return request({
+        url:'appstore/html/api/information/list',
+        method: 'post',
+        data
+    })
+}
+export function fetchInformationDetail(data) {
+    return request({
+        url:'appstore/html/api/information/detail',
+        method: 'post',
+        data
+    })
+}

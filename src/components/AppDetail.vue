@@ -261,7 +261,6 @@
     font-size: 28px/@ratio;
     font-weight: normal;
   }
-
   //--基本信息
   .section-brief {
     background: #fff;

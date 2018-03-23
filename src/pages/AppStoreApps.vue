@@ -3,20 +3,20 @@
         <x-header :left-options="{backText:''}">
             {{title}}
             <router-link :to="{name: 'AppStoreSearch', append: false, params: {hotWord: hotword}}" slot="right">
-                <x-icon type="ios-search" size="23"></x-icon>
+                <x-icon type="ios-search" size="23" style="fill: #666"></x-icon>
             </router-link>
         </x-header>
         <main class="main">
             <scroller
                     class="list-detail"
                     ref="scroller"
+                    v-if="apps.length"
                     :on-refresh="refresh"
                     :on-infinite="getMore">
-                <template v-if="apps.length">
                     <div class="list-item" v-for="item in apps" :key="item.id">
                         <router-link :to="{name: 'AppDetail',append:false, params:{appId: item.id}, query: {isSub: true}}" class="list-item-c">
                             <div class="list-item-icon-c">
-                                <img default-src="static/images/placeholder-appbg.png" class="list-item-icon" :src="item.iconUrl">
+                                <img class="list-item-icon" v-lazy="item.iconUrl">
                             </div>
                             <div>
                                 <div class="list-item-name">{{item.name}}</div>
@@ -26,14 +26,23 @@
                         </router-link>
                         <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                     </div>
-                </template>
             </scroller>
         </main>
+        <loading :show="loading"></loading>
+        <div v-if="!loading && failLoaded && apps.length === 0" class="fail-tip" @click="getApps">
+            <div>
+                <div>oops!获取失败了</div>
+                <div class="fail-tip-refresh">
+                    <x-icon type="ios-refresh" style="fill: #1AAD19"></x-icon>
+                    <span>重新获取</span>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-    import {XHeader, Grid, GridItem} from 'vux'
+    import {XHeader, Loading} from 'vux'
     import BtnDownload from '../components/btn-download'
     import {formatSize} from '../filters'
     import sample from 'lodash/sample'
@@ -46,9 +55,10 @@
                 apps: [],
                 hotWords: null,
                 loading: false,
+                failLoaded: false,
                 queryData: {
                     catId: '',
-                    pageIndex: 0,
+                    pageIndex: 1,
                     pageSize: 10
                 }
             }
@@ -73,6 +83,7 @@
             }
         },
         created() {
+            this.getApps()
             this.getHotWords()
             document.title = '应用分类:' + this.title
         },
@@ -152,14 +163,16 @@
             },
             failCb(done) {
                 this.loading = false
+                this.failLoaded = true
                 if(typeof done === 'function') {
                     done()
                 }
-                this.$vux.toast.text('获取数据失败', 'bottom')
+                this.$vux.toast.text('加载超时', 'bottom')
             },
             refresh(done) {
+                this.apps = []
                 this.queryData.pageIndex = 1
-                !this.loading && this.getApps(done)
+                this.getApps(done)
             },
             getMore(done) {
                 this.queryData.pageIndex++
@@ -169,8 +182,8 @@
         },
         components: {
             XHeader,
-            Grid, GridItem,
             BtnDownload,
+            Loading
         },
         filters: {
             formatSize
@@ -192,13 +205,10 @@
         display: flex;
         flex-direction: column;
         .vux-header {
-            height: 45px;
             flex-shrink: 0;
             position: relative;
             z-index: 2;
-            &:after {
-                .setBottomLine(#c2c2c3)
-            }
+            background: #fff;
         }
         .main {
             flex: 1;
@@ -214,7 +224,7 @@
                 }
             }
             .list-item-c {
-                height: 80px;
+                height: 94px;
                 display: flex;
                 align-items: center;
                 box-sizing: border-box;
@@ -230,6 +240,7 @@
             }
             .list-item-icon {
                 width: 100%;
+                height: 100%;
             }
             .list-item-name {
                 font-size: 16px;
@@ -248,8 +259,8 @@
                 max-width: 200px;
             }
             .btn-download {
-                width: 60px;
-                height: 25px;
+                width: 55px;
+                height: 24px;
                 font-size: 12px;
                 position: absolute;
                 right: 13px;
@@ -259,5 +270,23 @@
             }
         }
 
+    }
+    .fail-tip{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        text-align: center;
+        color: #999;
+        .fail-tip-refresh{
+            margin-top: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #009def;
+        }
     }
 </style>
