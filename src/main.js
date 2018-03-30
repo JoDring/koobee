@@ -13,7 +13,7 @@ Vue.use(VueLazyload, {
     loading: 'static/images/palceholder-logo.png',
     attempt: 1
 })
-import {AjaxPlugin, LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin} from 'vux';
+import {AjaxPlugin, LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';
 Vue.use(ConfigPlugin, {
     $layout: 'VIEW_BOX'
 });
@@ -22,6 +22,7 @@ Vue.use(LoadingPlugin);
 Vue.use(ToastPlugin);
 Vue.use(ConfirmPlugin);
 Vue.use(AlertPlugin);
+Vue.use(BusPlugin);
 Vue.use(AjaxPlugin);
 const FastClick = require('fastclick')
 FastClick.attach(document.body)

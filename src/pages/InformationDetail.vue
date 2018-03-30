@@ -4,17 +4,21 @@
             {{title}}
         </x-header>-->
         <main class="main">
-            <div class="information-detail-content" v-if="detail" v-html="detail.body"></div>
-            <div v-else style="text-align: center; margin: 40px 0; font-size: 16px">无数据...</div>
+            <div id="information-content" class="information-detail-content">
+                <div v-if="detail" v-html="detail.body"></div>
+                <div v-else style="text-align: center; margin: 40px 0; font-size: 16px">无数据...</div>
+            </div>
             <div class="detail-information-list" v-if="sampleList && sampleList.length > 0">
                 <div class="list-item" v-for="item in sampleList" @click="goToDetail(item)">
-                    <img v-lazy="item.imageUrl" class="list-item-img">
+                    <div v-lazy:background-image="{src: item.imageUrl, loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"
+                         class="list-item-img" v-if="onLine"></div>
+                    <div class="list-item-img" v-else></div>
                     <div class="list-item-txt">
                         <div class="item-title">
                             {{item.title}}
                         </div>
                         <div class="item-time">
-                            <span><<{{item.appName}}>></span>
+                            <span>《{{item.appName}}》</span>
                             <span>{{item.timeStr}}</span>
                         </div>
                     </div>
@@ -40,7 +44,8 @@
                 detail: null,
                 loading: false,
                 list: [],
-                app: null
+                app: null,
+                onLine: window.navigator.onLine
             }
         },
         props: {
@@ -69,54 +74,108 @@
             metaNode.content = 'never'
             document.head.appendChild(metaNode)
             document.title = this.title
-            this.getInformationDetail()
+            this.getInformationDetail();
+            this.$vux.bus.$on('off-line', () => {
+                this.onLine = false;
+                this.removeSrc()
+            })
+            this.$vux.bus.$on('on-line', () => {
+                this.onLine = true;
+                this.refillSrc()
+            })
         },
         beforeRouteUpdate(to, from, next) {
             this.getInformationDetail(to.params.id)
             next()
-            const scrollElm = document.querySelector('.main')
-            scrollElm.scrollTop = 0
         },
         methods: {
             //根据详情分类id获取详情
             getInformationDetail(id) {
                 const appId = id ? id : this.id
                 this.loading = true;
+                this.$vux.loading.show();
                 return fetchInformationDetail({id: appId}).then(res => {
                     this.loading = false;
+                    this.$vux.loading.hide();
                     if (res.code === '0') {
                         this.detail = res.data.detail
-                        this.app = res.data.detail.app
+                        this.app = res.data.detail.app;
+                        const scrollElm = document.querySelector('.main')
+                        scrollElm.scrollTop = 0
+                        //更新推荐列表
+                        if (!this.informationList || this.informationList.length === 0) {
+                            fetchInformationList({pageIndex: 1, pageSize: 100}).then(res => {
+                                if (res.code === '0') {
+                                    this.list = res.data.list
+                                }
+                            })
+                        }
+                        const list = this.informationList ? this.informationList : this.list
+                        if(list && list.length) {
+                            this.list = list.filter(v => {
+                                return v.id !== this.id
+                            })
+                        }
+                        //上报统计
+                        window.MtaH5 && window.MtaH5.clickStat('game_to_info_detail', {
+                            'id': this.detail.id,
+                            'title': this.detail.title,
+                            'source': this.detail.source,
+                            'appname': this.detail.appName
+                        });
                     }
-                    if (!this.informationList || this.informationList.length === 0) {
-                        fetchInformationList({pageIndex: 1, pageSize: 100}).then(res => {
-                            if (res.code === '0') {
-                                this.list = res.data.list
-                            }
-                        })
-                    }
+
                 }, () => {
                     this.loading = false;
+                    this.$vux.loading.hide();
                     this.$vux.toast.text('加载超时', 'bottom')
                 })
             },
             goToDetail(item) {
-                const list = this.list ? this.list : this.informationList
-                const filterList = list.filter(v => {
-                    return v.id !== item.id
-                })
-                this.list = filterList;
                 this.$router.push({
                         name: 'InformationDetail',
                         append: false,
                         params: {
                             id: item.id,
-                            informationList: filterList
+                            informationList: this.list
                         }
                     }
-                );
-            }
+                )
+            },
+            removeSrc() {
+                const container = document.getElementById('information-content')
+                if(container) {
+                    //处理图片
+                    this.imgArray = Array.from(container.getElementsByTagName('img'))
+                    this.imgArray.forEach(v => {
+                        v.setAttribute('width', v.width)
+                        v.setAttribute('height', v.height)
+                        v.setAttribute('data-src', v.src)
+                        v.src = ''
+                    })
+                    //处理视频
+                    this.iframeArray = Array.from(container.getElementsByTagName('iframe'))
+                    this.iframeArray.forEach(v => {
+                        v.setAttribute('sandbox', 'allow-same-origin')
+                        v.setAttribute('data-src', v.src)
+                    })
+                }
 
+            },
+            refillSrc() {
+                if(this.imgArray) {
+                    this.imgArray.forEach(v => {
+                        v.src = v.getAttribute('data-src')
+                    })
+                }
+                if(this.iframeArray) {
+                    this.iframeArray.forEach(v => {
+                        v.removeAttribute('sandbox')
+                        v.src = '';
+                        v.src = v.getAttribute('data-src')
+                    })
+                }
+            }
         },
         components: {
             XHeader,
@@ -136,7 +195,7 @@
 
     .information-detail {
         height: 100%;
-        font-size: 14px;
+        font-size: 15px;
         color: #222;
         display: flex;
         flex-direction: column;
@@ -156,44 +215,47 @@
             color: #313736;
             line-height: 1.8;
             text-align: justify;
+            min-height: 300px;
             p {
-                font-size: 14px;
+                font-size: 15px;
                 color: #313736;
                 & + p{
                     margin-top: 20px;
                 }
             }
             h1 {
-                font-size: 17px;
-                line-height: 1.3;
+                font-size: 21px;
+                line-height: 1.5;
                 color: #2b2b2b;
             }
             img {
                 display: block;
                 margin: 15px 0 25px 0;
                 max-width: 100%;
+                background: #eee;
             }
             iframe{
                 max-width: 100% !important;
                 height: auto !important;
                 margin-top: 10px;
+                background: #000;
             }
             .Mid2L_title {
-                text-align: center;
+                text-align: left;
                 h1{
                     display: inline-block;
                     text-align: left;
                 }
                 .detail {
-                    display: inline-block;
+                    display: block;
                     text-align: left;
-                    margin-top: 10px;
-                    font-size: 10px;
+                    margin-top: 5px;
+                    font-size: 15px;
                     color: #a1a1a1;
                 }
             }
             .Mid2L_con {
-                padding-top: 15px;
+                padding-top: 25px;
             }
         }
         //--list
@@ -204,21 +266,29 @@
             .list-item {
                 display: flex;
                 align-items: center;
-                height: 100px;
+                height: 94px;
                 padding: 0 12px;
                 box-sizing: border-box;
                 position: relative;
                 &:before {
                     .setTopLine(#e4e4e4)
                 }
+                &:first-child:before {
+                    border-top-color:#cacaca;
+                }
                 &:active {
                     background-color: #eee;
                 }
             }
             .list-item-img {
+                width: 98px;
                 height: 65px;
-                margin-right: 10px;
+                margin-right: 20px;
                 flex-shrink: 0;
+                background-color: #eee;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
             }
             .list-item-txt {
                 height: 65px;

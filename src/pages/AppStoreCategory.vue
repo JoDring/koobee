@@ -11,20 +11,23 @@
                 <div class="list-title">游戏分类</div>
                 <grid :cols="2">
                     <grid-item
-                            :link="{name: 'AppStoreApps', append: false, params: {type: 'categoryList', title: item.typeName}, query: {catId: '-' + item.id}}"
+                            :link="{name: 'AppStoreList', append: false, params: {type: 'categoryList', catId: '-' + item.id, title: item.typeName}}"
                             class="list-item" v-for="item in list.game_cat"
                             :key="item.id">
-                        <div class="list-item-img-c"><img class="list-item-img" v-lazy="item.icon"></div>
+                        <div class="list-item-img-c"><img class="list-item-img" :src="item.icon"></div>
                         <span class="list-item-name">{{item.typeName}}</span>
                     </grid-item>
                 </grid>
                 <div class="list-title">应用分类</div>
                 <grid :cols="2">
                     <grid-item
-                            :link="{name: 'AppStoreApps', append: false, params: {type: 'categoryList', title: item.typeName}, query: {catId: '-' + item.id}}"
+                            :link="{name: 'AppStoreList', append: false, params: {type: 'categoryList', catId: '-' + item.id, title: item.typeName}}"
                             class="list-item" v-for="item in list.app_cat"
                             :key="item.id">
-                        <div class="list-item-img-c"><img class="list-item-img" v-lazy="item.icon"></div>
+                        <div class="list-item-img-c">
+                            <img class="list-item-img" v-lazy="item.icon" v-if="onLine">
+                            <img class="list-item-img" src="static/images/palceholder-logo.png">
+                        </div>
                         <span class="list-item-name">{{item.typeName}}</span>
                     </grid-item>
                 </grid>
@@ -43,7 +46,8 @@
         data() {
             return {
                 list: null,
-                hotWords: null
+                hotWords: null,
+                onLine: window.navigator.onLine
             }
         },
         computed: {
@@ -65,6 +69,12 @@
                     }
                 })
             )
+            this.$vux.bus.$on('off-line', () => {
+                this.onLine = false
+            })
+            this.$vux.bus.$on('on-line', () => {
+                this.onLine = true
+            })
         },
         beforeRouteEnter(to, from, next) {
             document.title = to.meta.title

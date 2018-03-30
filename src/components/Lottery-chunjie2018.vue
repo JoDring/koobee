@@ -283,6 +283,7 @@
                 j();
                 a.addEventListener("resize", j)
             })(window);
+
         },
         created() {
             //所有初始化要等获得数据后

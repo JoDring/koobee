@@ -198,6 +198,15 @@ const JsCallApp = (function(){
 		}
 		return window.jsObj.jsCallTransferParam(param);
 	}
+	/**
+	* 获取当前app名称: gamecenter || appstore
+	*/
+	function getApplicationName(){
+		if(!window.jsObj || !window.jsObj.jsCallGetApplicationName){
+			showUpdateAppstoreNotice();
+		}
+		return window.jsObj.jsCallGetApplicationName();
+	}
 
 	return {
 		openApp, //打开app
@@ -216,7 +225,8 @@ const JsCallApp = (function(){
 		isSystemAppstore, //判断是不是系统或三方版本
 		requestServerByAsync,  //代理加密请求  异步
 		transferParam, //单纯将参数传递致客户端app
-		showUpdateAppstoreNotice //弹窗更新
+		showUpdateAppstoreNotice, //弹窗更新
+        getApplicationName //弹窗更新
 	};
 })();
 

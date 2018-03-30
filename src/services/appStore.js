@@ -1,48 +1,49 @@
 import request from '../util/request'
 
-export function fetchHome(data) {
+export function fetchHome(params) {
     return request({
         url:'appstore/html/api/home',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchNeed(data) {
+export function fetchNeed(params) {
     return request({
         url:'appstore/html/api/need',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchGame(data) {
+export function fetchGame(params) {
     return request({
         url:'appstore/html/api/game',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchRank(data) {
+export function fetchRank(params) {
     return request({
         url:'appstore/html/api/rank',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchCategory(data) {
+// 分类
+export function fetchCategory(params) {
     return request({
         url:'appstore/html/api/category',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchCategoryList(data) {
+export function fetchCategoryList(params) {
     return request({
         url:'appstore/html/api/category/list',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-// 搜索结果
+// 搜索
 export function fetchSearchResult(data) {
     return request({
         url:'appstore/html/api/search/result',
@@ -50,7 +51,6 @@ export function fetchSearchResult(data) {
         data
     })
 }
-// 下拉提示
 export function fetchSearchMatch(data) {
     return request({
         url:'appstore/html/api/search/match',
@@ -61,21 +61,21 @@ export function fetchSearchMatch(data) {
 export function fetchSearchHotWords() {
     return request({
         url:'appstore/html/api/search/hotwords',
-        method: 'post'
+        method: 'get'
     })
 }
 // 资讯
-export function fetchInformationList(data) {
+export function fetchInformationList(params) {
     return request({
         url:'appstore/html/api/information/list',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
-export function fetchInformationDetail(data) {
+export function fetchInformationDetail(params) {
     return request({
         url:'appstore/html/api/information/detail',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }

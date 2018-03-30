@@ -12,31 +12,40 @@
 
         </div>
         <div class="list-home">
+            <transition name="vux-fade">
+                <div class="my-scroller-mask"
+                     style="position: absolute;
+                            z-index: 9;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: #fff;"
+                     v-show="showScrollerMask"></div>
+            </transition>
             <scroller
                     ref="scroller"
                     :on-refresh="refresh"
                     :on-infinite="getMore"
                     v-if="apps.length">
                 <grid class="category" v-if="navBars.length">
-                    <grid-item v-for="item in navBars"
-                               :link="categoryMap[item.type]"
-                               :key="item.id">
-                        <img slot="icon" v-lazy="item.iconUrl">
-                        <span class="category-title" slot="label">{{ item.title }}</span>
+                    <grid-item v-for="item in navBars" :key="item.id">
+                        <router-link :to="categoryMap[item.type]" slot="icon"><img v-lazy="item.iconUrl"></router-link>
+                        <router-link tag="span" :to="categoryMap[item.type]" class="category-title" slot="label">{{ item.title }}</router-link>
                     </grid-item>
                 </grid>
                 <div class="list-item" v-for="item in apps" :key="item.id">
-                    <router-link class="list-item-c"
-                                 :to="{name: 'AppDetail', params:{appId: item.id}, query: {isSub: true}}">
+                    <div class="list-item-c" @click="goToDetail(item)">
                         <div class="list-item-icon-c">
-                            <img class="list-item-icon" v-lazy="item.iconUrl">
+                            <img class="list-item-icon" v-lazy="item.iconUrl" v-if="onLine">
+                            <img class="list-item-icon" src="static/images/palceholder-logo.png" v-else>
                         </div>
                         <div>
                             <div class="list-item-name">{{item.name}}</div>
                             <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
-                    </router-link>
+                    </div>
                     <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                 </div>
             </scroller>
@@ -53,6 +62,7 @@
                 <x-icon class="icon-close" type="ios-close-empty" size="22"></x-icon>
             </div>
         </div>
+        <refresh-tip v-if="!loading && failLoaded && apps.length === 0" @click.native="getHomeData"></refresh-tip>
         <loading :show="loading"></loading>
     </div>
 </template>
@@ -62,6 +72,7 @@
     import {formatSize} from '../filters'
     import {fetchHome, fetchSearchHotWords} from '../services/appStore'
     import BtnDownload from '../components/btn-download'
+    import RefreshTip from '../components/RefreshTip'
 
     export default {
         name: "app-store-home",
@@ -82,20 +93,46 @@
                     game: {name: 'AppStoreApps', append: false, params: {type: 'game', title: '热门游戏'}},
                     category: {name: 'AppStoreCategory', append: false},
                 },
-                title: '应用市场'
+                title: '应用市场',
+                failLoaded: false,
+                onLine: window.navigator.onLine,
+                scrollPosition: {x: 0, y: 0, animate: false},
+                showScrollerMask: false
             }
         },
         created() {
             this.getHomeData().then(this.getHotWords)
+            this.$vux.bus.$on('off-line', () => {
+                this.onLine = false
+            })
+            this.$vux.bus.$on('on-line', () => {
+                this.onLine = true
+            })
         },
         beforeRouteEnter(to, from, next) {
             document.title = to.meta.title
+            next(vm => {
+                setTimeout(function () {
+                    vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
+                }, 250)
+                setTimeout(function () {
+                    vm.showScrollerMask = false
+                }, 450)
+            })
+        },
+        beforeRouteLeave(to, from, next) {
+            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+            if (position) {
+                this.scrollPosition = {x: 0, y: position.top, animate: false}
+            }
+            this.showScrollerMask = true
             next()
         },
         methods: {
             refresh(done) {
                 this.apps = []
                 this.queryData.pageIndex = 1
+                this.$vux.loading.show()
                 !this.loading && this.getHomeData(done)
             },
             getMore(done) {
@@ -104,6 +141,7 @@
             },
             getHomeData(done) {
                 this.loading = true;
+                this.$vux.loading.hide()
                 return fetchHome(this.queryData).then(res => {
                     this.loading = false;
                     if (typeof done === 'function') {
@@ -116,14 +154,20 @@
                         if (res.data.apps && res.data.apps.length) {
                             this.apps = [...this.apps, ...res.data.apps]
                         } else {
-                            this.$refs['scroller'].finishInfinite(true)
+                            if (typeof done === 'function') {
+                                done(true)
+                            }
+                            //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                         }
                     }
                 }, () => {
                     this.loading = false
+                    this.$vux.loading.hide()
+                    this.failLoaded = true
                     if (typeof done === 'function') {
-                        done()
+                        done(true)
                     }
+                    //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                     this.$vux.toast.text('获取数据失败', 'bottom')
                 })
             },
@@ -135,8 +179,14 @@
                 })
             },
             goToSearchPage() {
-                const searchWord = this.hotWords[this.$refs['hotWords'].currentIndex].searchWord || ''
-                this.$router.push({name: 'AppStoreSearch', append: false, params: {hotWord: searchWord}})
+                let searchWord;
+                if(this.hotWords.length) {
+                    searchWord = this.hotWords[this.$refs['hotWords'].currentIndex].searchWord
+                }
+                this.$router.push({name: 'AppStoreSearch', append: false, params: {hotWord: searchWord || '游戏'}})
+            },
+            goToDetail(app) {
+                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id}, query: {isSub: true}})
             }
         },
         components: {
@@ -146,7 +196,8 @@
             XImg,
             BtnDownload,
             Marquee, MarqueeItem,
-            Loading
+            Loading,
+            RefreshTip
         },
         filters: {
             formatSize
@@ -230,6 +281,7 @@
             }
         }
         .list-item-c {
+            width: 100%;
             display: flex;
             align-items: center;
             padding: 0 13px;

@@ -3,7 +3,8 @@
         <div class="header">
             <x-icon class="header-icon" type="ios-arrow-left" size="25" @click.native="$router.go(-1)"></x-icon>
             <div class="search-input-c">
-                <input id="search-input" type="text" class="search-input" v-model="queryData.query" :placeholder="hotWord">
+                <input id="search-input" type="text" class="search-input" v-model="queryData.query"
+                       :placeholder="hotWord">
                 <label v-show="queryData.query" @click="queryData.query = ''" for="search-input">
                     <x-icon class="icon-close" type="ios-close" size="22"></x-icon>
                 </label>
@@ -14,13 +15,17 @@
             <!--热门搜索-->
             <div class="hot-words" v-if="hotWords.length && showHotWords && !queryData.query && !searchResult">
                 <div class="hot-word-title">热门搜索</div>
-                <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item.searchWord)">{{item.searchWord}}</div>
+                <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item.searchWord)">
+                    {{item.searchWord}}
+                </div>
             </div>
             <!--match列表-->
             <div class="list-match" v-if="searchMatch">
                 <div v-if="searchMatch.data && searchMatch.data.app && searchMatch.data.app.id"
                      class="list-match-item">
-                    <router-link :to="{name: 'AppDetail', append:false, params:{appId:searchMatch.data.app.id}, query: {isSub: true}}" class="list-match-item-c">
+                    <router-link
+                            :to="{name: 'AppDetail', append:false, params:{appId:searchMatch.data.app.id}, query: {isSub: true}}"
+                            class="list-match-item-c">
                         <div class="list-match-item-icon-c">
                             <img class="list-match-item-icon" :src="searchMatch.data.app.iconUrl">
                         </div>
@@ -29,7 +34,8 @@
                             <div class="list-match-item-brief">{{searchMatch.data.app.apkSize | formatSize(2)}}</div>
                         </div>
                     </router-link>
-                    <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl" btnText="下载"></btn-download>
+                    <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl"
+                                  btnText="下载"></btn-download>
                 </div>
                 <div v-if="historySearchWords.length && !showHotWords" class="history-search-list">
                     <div class="history-search-delete" @click="clearHistoryWords">
@@ -52,10 +58,22 @@
                     </div>
                 </div>
                 <div v-if="searchMatch.data && !searchMatch.data.app.id && !searchMatch.data.items.length">
-                    <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">{{searchMatch.msg}}</div>
+                    <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">{{searchMatch.msg}}
+                    </div>
                 </div>
             </div>
             <!--result列表-->
+            <transition name="vux-fade">
+                <div class="my-scroller-mask"
+                     style="position: absolute;
+                            z-index: 9;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: #fff;"
+                     v-show="showScrollerMask"></div>
+            </transition>
             <scroller
                     class="list-result"
                     ref="scroller"
@@ -63,16 +81,17 @@
                     :on-infinite="getMore"
                     v-if="searchResult && searchResult.apps && searchResult.apps.length">
                 <div class="list-item" v-for="item in searchResult.apps" :key="item.id">
-                    <router-link  :to="{name: 'AppDetail',append:false, params:{appId: item.id}, query: {isSub: true}}" class="list-item-c">
+                    <div @click="goToDetail(item)" class="list-item-c">
                         <div class="list-item-icon-c">
-                            <img class="list-item-icon" v-lazy="item.iconUrl">
+                            <img class="list-item-icon" v-lazy="item.iconUrl" v-if="onLine">
+                            <img class="list-item-icon" src="static/images/palceholder-logo.png" v-else>
                         </div>
                         <div>
                             <div class="list-item-name">{{item.name}}</div>
                             <div class="list-item-brief">{{item.apkSize | formatSize(2)}}</div>
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
-                    </router-link>
+                    </div>
                     <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                 </div>
             </scroller>
@@ -88,22 +107,26 @@
     import {formatSize} from '../filters'
     import BtnDownload from '../components/btn-download'
     import {fetchSearchHotWords, fetchSearchMatch, fetchSearchResult} from '../services/appStore'
+
     export default {
         name: "app-store-search",
         data() {
             return {
                 queryData: {
-                    query:'',
+                    query: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
-                hotWords:[],
+                hotWords: [],
                 showHotWords: true,
                 searchMatch: {data: null},
                 searchResult: null,
                 loading: false,
                 title: '应用搜索',
-                historySearchWords: this.getCacheHistory() ? this.getCacheHistory() : []
+                historySearchWords: this.getCacheHistory() ? this.getCacheHistory() : [],
+                onLine: window.navigator.onLine,
+                scrollPosition: {x: 0, y: 0, animate: false},
+                showScrollerMask: false
             }
         },
         props: {
@@ -112,21 +135,21 @@
                 default: '游戏'
             }
         },
-        watch:{
+        watch: {
             'queryData.query': function (newValue) {
-                if(this.hotWords.length && !newValue) {
+                if (this.hotWords.length && !newValue) {
                     this.showHotWords = true
                     this.searchMatch = null
                     this.searchResult = null
-                } else{
+                } else {
                     this.searchResult = null
                     !this.loading && this.getMatch()
                 }
             }
         },
         computed: {
-            results(){
-                if(this.hotWords.length) {
+            results() {
+                if (this.hotWords.length) {
                     return this.hotWords.map(v => {
                         v.title = v.searchWord;
                         return v
@@ -134,19 +157,40 @@
                 }
             }
         },
-        created(){
-            this.getHotWords()
+        created() {
+            this.getHotWords();
+            this.$vux.bus.$on('off-line', () => {
+                this.onLine = false
+            })
+            this.$vux.bus.$on('on-line', () => {
+                this.onLine = true
+            })
         },
-        beforeRouteEnter (to, from, next) {
+        beforeRouteEnter(to, from, next) {
             document.title = to.meta.title
+            next(vm => {
+                setTimeout(function () {
+                    vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
+                }, 250)
+                setTimeout(function () {
+                    vm.showScrollerMask = false
+                }, 450)
+            })
+        },
+        beforeRouteLeave(to, from, next) {
+            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+            if (position) {
+                this.scrollPosition = {x: 0, y: position.top, animate: false}
+            }
+            this.showScrollerMask = true
             next()
         },
         methods: {
             getHotWords() {
                 this.$vux.loading.show();
-                fetchSearchHotWords().then( res => {
+                fetchSearchHotWords().then(res => {
                     this.$vux.loading.hide();
-                    if(res.code === '0') {
+                    if (res.code === '0') {
                         this.hotWords = res.data.hotwords
                         this.hotWords.length = 8
                     }
@@ -156,11 +200,12 @@
             },
             getMatch: debounce(function () {
                 this.$vux.loading.show();
-                fetchSearchMatch(this.queryData).then( res => {
+                fetchSearchMatch(this.queryData).then(res => {
                     this.$vux.loading.hide();
-                    if(res.code === '0') {
+                    if (res.code === '0') {
                         this.searchMatch = res
                     }
+                    document.querySelector('.main').scrollTop = 0
                 }, () => {
                     this.$vux.loading.hide();
                 })
@@ -170,21 +215,18 @@
                 this.loading = true;
                 this.searchMatch = null
                 this.queryData.query = this.queryData.query ? this.queryData.query : this.hotWord;
-                fetchSearchResult(this.queryData).then( res => {
-                    if(typeof done === 'function'){
+                fetchSearchResult(this.queryData).then(res => {
+                    if (typeof done === 'function') {
                         done()
                     }
                     this.$vux.loading.hide();
                     this.loading = false
-                    if(res.code === '0') {
+                    if (res.code === '0') {
                         this.searchResult = res.data
                     }
-                     // 保存搜索历史
+                    // 保存搜索历史
                     this.setCacheHistory(this.queryData.query);
                 }, () => {
-                    if(typeof done === 'function'){
-                        done()
-                    }
                     this.$vux.loading.hide();
                     this.loading = false
                 })
@@ -194,11 +236,11 @@
                 this.showHotWords = false
             },
             setCacheHistory(word) {
-                if(word && word.trim()) {
+                if (word && word.trim()) {
                     const exist = this.historySearchWords.some(v => {
                         return v === word
                     })
-                    if(exist) {
+                    if (exist) {
                         return
                     }
                     this.historySearchWords.push(word)
@@ -207,8 +249,7 @@
                 }
             },
             setQuery(data) {
-              this.queryData.query = data
-                document.querySelector('.main').scrollTop = 0
+                this.queryData.query = data
             },
             getCacheHistory() {
                 return JSON.parse(window.localStorage.getItem('historySearchWordsFromAppStore'))
@@ -223,28 +264,34 @@
                 this.getResult(done)
             },
             getMore(done) {
-                this.queryData.pageIndex ++
+                this.queryData.pageIndex++
                 this.loading = true;
-                fetchSearchResult(this.queryData).then( res => {
-                    if(typeof done === 'function'){
+                fetchSearchResult(this.queryData).then(res => {
+                    if (typeof done === 'function') {
                         done()
                     }
                     this.loading = false
-                    if(res.code === '0') {
-                        if(res.data.apps && res.data.apps.length) {
+                    if (res.code === '0') {
+                        if (res.data.apps && res.data.apps.length) {
                             this.searchResult.apps = [...this.searchResult.apps, ...res.data.apps]
                         } else {
-                            console.log('finishInfinite')
-                            this.$refs['scroller'].finishInfinite(true)
+                            if (typeof done === 'function') {
+                                done(true)
+                            }
+                            //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                         }
                     }
                 }, () => {
-                    if(typeof done === 'function'){
-                        done()
+                    if (typeof done === 'function') {
+                        done(true)
                     }
+                    //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                     this.loading = false
                 })
 
+            },
+            goToDetail(app) {
+                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id}, query: {isSub: true}})
             }
         },
         components: {
@@ -258,16 +305,17 @@
 
 <style lang="less">
     @import "~vux/src/styles/weui/base/fn.less";
-    @black : #000;
-    @gray-dark : #5d5d5d;
-    @gray-light : #919191;
+
+    @black: #000;
+    @gray-dark: #5d5d5d;
+    @gray-light: #919191;
 
     @bg-gray: #e5e5e5;
-    .search-page{
+    .search-page {
         height: 100%;
         display: flex;
         flex-direction: column;
-        .header{
+        .header {
             width: 100%;
             height: 45px;
             display: flex;
@@ -279,18 +327,18 @@
                 .setBottomLine(#d7d7d7)
             }
         }
-        .header-icon{
+        .header-icon {
             width: 50px;
             fill: #666;
         }
-        .search-input-c{
+        .search-input-c {
             display: block;
             height: 100%;
             flex: 1;
             margin-right: 15px;
             position: relative;
         }
-        .icon-close{
+        .icon-close {
             position: absolute;
             z-index: 2;
             right: -10px;
@@ -299,49 +347,49 @@
             margin: auto;
             fill: #d7d7d7;
         }
-        .search-input{
+        .search-input {
             display: block;
             height: 100%;
             width: 100%;
             font-size: 15px;
             border: none;
             box-sizing: border-box;
-            padding-left:15px;
+            padding-left: 15px;
             &:focus {
                 outline: none;
             }
         }
         //---
-        .main{
+        .main {
             flex: 1;
             position: relative;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
         }
         //---
-        .hot-words{
+        .hot-words {
             text-align: center;
             font-size: 16px;
             color: #009def;
             background-color: #fff;
         }
-        .hot-word-title{
+        .hot-word-title {
             font-size: 21px;
-            color:#222;
+            color: #222;
             margin: 28px 0 24px 0;
         }
-        .hot-word-item{
+        .hot-word-item {
             margin-bottom: 14px;
-            &:active{
+            &:active {
                 background-color: #ddd;
             }
         }
         //---
-        .list-match{
-            .list-match-item{
+        .list-match {
+            .list-match-item {
                 position: relative;
             }
-            .list-match-item-c{
+            .list-match-item-c {
                 height: 60px;
                 display: flex;
                 align-items: center;
@@ -352,17 +400,17 @@
                     background-color: #eee;
                 }
             }
-            .list-match-item-icon-c{
+            .list-match-item-icon-c {
                 width: 40px;
                 height: 40px;
                 border-radius: 4px;
                 margin-right: 10px;
                 overflow: hidden;
             }
-            .list-match-item-icon{
+            .list-match-item-icon {
                 width: 100%;
             }
-            .list-match-item-name{
+            .list-match-item-name {
                 font-size: 16px;
                 color: @black;
                 white-space: nowrap;
@@ -370,7 +418,7 @@
                 text-overflow: ellipsis;
                 max-width: 200px;
             }
-            .list-match-item-brief{
+            .list-match-item-brief {
                 font-size: 11px;
                 color: @gray-dark;
                 white-space: nowrap;
@@ -378,7 +426,7 @@
                 text-overflow: ellipsis;
                 max-width: 200px;
             }
-            .btn-download{
+            .btn-download {
                 width: 50px;
                 height: 21px;
                 font-size: 12px;
@@ -390,7 +438,7 @@
             }
         }
         //---
-        .match-item{
+        .match-item {
             height: 45px;
             padding: 0 13px;
             line-height: 45px;
@@ -400,10 +448,10 @@
                 background-color: #eee;
             }
         }
-        .history-search-list{
+        .history-search-list {
             background: #efefef;
             position: relative;
-            .history-search-delete{
+            .history-search-delete {
                 position: absolute;
                 z-index: 2;
                 width: 40px;
@@ -412,18 +460,18 @@
                 right: 0;
                 padding: 8px;
             }
-            .search-delete-icon{
+            .search-delete-icon {
                 fill: #bbb;
                 float: right;
             }
-            .match-item{
+            .match-item {
                 display: flex;
                 align-items: center;
             }
         }
         //---
-        .list-result{
-            .list-item{
+        .list-result {
+            .list-item {
                 position: relative;
                 &:active {
                     background-color: #eee;
@@ -437,17 +485,17 @@
                 background: #fff;
                 padding: 0 20px;
             }
-            .list-item-icon-c{
+            .list-item-icon-c {
                 width: 65px;
                 height: 65px;
                 border-radius: 8px;
                 margin-right: 10px;
                 overflow: hidden;
             }
-            .list-item-icon{
+            .list-item-icon {
                 width: 100%;
             }
-            .list-item-name{
+            .list-item-name {
                 font-size: 16px;
                 color: @black;
                 white-space: nowrap;
@@ -455,7 +503,7 @@
                 text-overflow: ellipsis;
                 max-width: 200px;
             }
-            .list-item-brief{
+            .list-item-brief {
                 font-size: 11px;
                 color: @gray-dark;
                 white-space: nowrap;
@@ -463,7 +511,7 @@
                 text-overflow: ellipsis;
                 max-width: 200px;
             }
-            .btn-download{
+            .btn-download {
                 width: 55px;
                 height: 24px;
                 font-size: 12px;

@@ -44,7 +44,11 @@
                         position: 'top'
                     })
                 }
-                window.location.href = url;
+                if(!window.jsObj) {
+                    window.location.href = url;
+                } else {
+                    this.$emit('click')
+                }
             }
         },
         computed: {
@@ -114,6 +118,7 @@
         border-radius: @weuiBtnBorderRadius;
         .setTapColor();
         overflow: hidden;
+        flex-shrink: 0;
         &:after {
             content: " ";
             width: 200%;
@@ -184,6 +189,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-weight: normal;
     }
 
     /*元旦2017*/
@@ -273,6 +279,29 @@
         }
         .process-text {
             color: #db1517;
+        }
+    }
+
+    /*橙色按钮样式*/
+    @orange : #ff6c3a;
+    .weui-btn.orange {
+        background: @orange;
+        color: @orange;
+        .process-bg {
+            background: @orange;
+        }
+        .process-text {
+            color: #fff;
+        }
+        &:active {
+            background: lighten(@orange, 5%);
+        }
+        &.weui-btn_plain-primary {
+            background: transparent;
+            border-color: @orange;
+            .process-text {
+                color: @weuiBtnPlainPrimaryColor;
+            }
         }
     }
 </style>

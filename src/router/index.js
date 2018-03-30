@@ -2,7 +2,7 @@ import Router from 'vue-router';
 
 const NotFound = () => import('../components/NotFound.vue');
 const H5Games = () => import('../components/H5Games.vue');
-const AppDetail = () => import('../components/AppDetail.vue');
+const AppDetail = () => import('../pages/AppDetail.vue');
 const AppStoreHome = () => import('../pages/AppStoreHome.vue');
 const AppStoreSearch = () => import('../pages/AppStoreSearch.vue');
 const AppStoreCategory = () => import('../pages/AppStoreCategory.vue');
@@ -44,9 +44,17 @@ export default new Router({
             props: true
         },
         {
+            path: '/AppStoreApps/:type/:catId',
+            name: 'AppStoreList',
+            meta:{title: '应用详情'},
+            component: AppStoreApps,
+            props: true
+        },
+        {
             path: '/AppDetail/:appId',
             name: 'AppDetail',
             component: AppDetail,
+            meta:{title: '应用详情'},
             props: true
         },
         {
