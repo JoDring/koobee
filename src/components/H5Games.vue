@@ -67,7 +67,7 @@
 <script>
   import {ViewBox, XImg} from 'vux';
 
-  const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/html/getData?id=' : 'http://192.168.1.148:8080/appstore/html/getData?id=';
+  const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/html/getData?id=' : 'http://192.168.1.148:8090/appstore/html/getData?id=';
   export default {
     name: 'H5Games',
     props: {

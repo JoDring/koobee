@@ -1,112 +1,116 @@
 <template>
-    <view-box ref="viewBox">
+    <div class="view-container">
         <template v-if="appList.length > 0">
-            <x-header v-if="$route.query.isSub" slot="header" :left-options="{backText: ''}">{{appList.length &&
+            <x-header class="view-header" v-if="$route.query.isSub" slot="header" :left-options="{backText: ''}">
+                {{appList.length &&
                 appList[0].name}}
             </x-header>
-            <section class="section-brief">
-                <div class="blur-img-c">
-                    <x-img container="#vux_view_box_body" class="blur-img"
-                           default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
-                           height="180"></x-img>
-                    <div class="mask-color"></div>
-                    <img class="mask-img" src="static/images/bg-mask.png" width="720" height="122">
-                </div>
-                <div class="logo-c">
-                    <x-img container="#vux_view_box_body" class="logo-big"
-                           default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
-                           height="180"></x-img>
-                    <div class="inverted-logo-c">
-                        <x-img container="#vux_view_box_body" class="logo-big inverted"
+            <div class="view-body">
+                <section class="section-brief">
+                    <div class="blur-img-c">
+                        <x-img container=".view-body" class="blur-img"
                                default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
                                height="180"></x-img>
+                        <div class="mask-color"></div>
+                        <img class="mask-img" src="static/images/bg-mask.png" width="720" height="122">
                     </div>
-                    <div class="inverted-mask"></div>
-                </div>
-                <div class="app-desc">
-                    <h1 class="app-desc-title">{{appList[0].name}}</h1>
-                    <p class="app-desc-detail">
-                        <span>{{appList[0].rating}}分</span><span>{{appList[0].downloadTimes | timesFormat}}人使用</span><span>{{appList[0].apkSizeFormat}}</span>
-                    </p>
-                </div>
-                <div class="app-down-btn">
-                    <btn-download :pause="appList[0].btnState.pause" :start-load="appList[0].btnState.startLoad"
-                                  :percentage="appList[0].btnState.percentage"
-                                  :url="appList[0].downloadUrl"></btn-download>
-                </div>
+                    <div class="logo-c">
+                        <x-img container=".view-body" class="logo-big"
+                               default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
+                               height="180"></x-img>
+                        <div class="inverted-logo-c">
+                            <x-img container=".view-body" class="logo-big inverted"
+                                   default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl"
+                                   width="180"
+                                   height="180"></x-img>
+                        </div>
+                        <div class="inverted-mask"></div>
+                    </div>
+                    <div class="app-desc">
+                        <h1 class="app-desc-title">{{appList[0].name}}</h1>
+                        <p class="app-desc-detail">
+                            <span>{{appList[0].rating}}分</span><span>{{appList[0].downloadTimes | timesFormat}}人使用</span><span>{{appList[0].apkSizeFormat}}</span>
+                        </p>
+                    </div>
+                    <div class="app-down-btn">
+                        <btn-download :url="appList[0].downloadUrl"></btn-download>
+                    </div>
 
-            </section>
-            <section class="app-images">
-                <x-img v-for="item in imgList" class="app-images-item" default-src="static/images/placeholder-appbg.png"
-                       :src="item" :key="item" container=".app-images" v-if="onLine"></x-img>
-                <img class="app-images-item" src="static/images/placeholder-appbg.png" v-else>
-            </section>
-            <section class="app-desc-detail">
-                <h2>【应用介绍】</h2>
-                <p :class="{'show-more': showMore}" v-html="appList[0].description"></p>
-            </section>
-            <a href="#" class="arrow-down-c" @click.prevent="showMore = !showMore">
-                <img src="../assets/arrow-down.png" class="arrow-down" width="60" height="60"
-                     :class="{rotated: showMore}">
-            </a>
-            <section class="app-version">
-                <p>最新版本: {{appList[0].versionName}}</p>
-                <p>更新时间: {{appList[0].updateTime}}</p>
-            </section>
-            <section class="app-ad" v-if="sameCatApps.length > 0">
-                <h2>相关推荐</h2>
-                <div class="app-ad-list">
-                    <flexbox :gutter="0">
-                        <flexbox-item :span="3" class="ad-list-item" v-for="item in sameCatApps" :key="item.id">
-                            <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
-                                <div class="logo-sm-c">
-                                    <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
-                                           :src="item.iconUrl" container="#vux_view_box_body" width="130"
-                                           height="130" v-if="onLine"></x-img>
-                                    <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                </section>
+                <section class="app-images">
+                    <img v-for="item in imgList"
+                         class="app-images-item"
+                         v-lazy="{src: item, loading: 'static/images/placeholder-appbg.png'}"
+                         :key="item"
+                         v-if="onLine">
+                </section>
+                <section class="app-desc-detail">
+                    <h2>【应用介绍】</h2>
+                    <p :class="{'show-more': showMore}" v-html="appList[0].description"></p>
+                </section>
+                <a href="#" class="arrow-down-c" @click.prevent="showMore = !showMore">
+                    <img src="../assets/arrow-down.png" class="arrow-down" width="60" height="60"
+                         :class="{rotated: showMore}">
+                </a>
+                <section class="app-version">
+                    <p>最新版本: {{appList[0].versionName}}</p>
+                    <p>更新时间: {{appList[0].updateTime}}</p>
+                </section>
+                <section class="app-ad" v-if="sameCatApps.length > 0">
+                    <h2>相关推荐</h2>
+                    <div class="app-ad-list">
+                        <flexbox :gutter="0">
+                            <flexbox-item :span="3" class="ad-list-item" v-for="item in sameCatApps" :key="item.id">
+                                <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
+                                    <div class="logo-sm-c">
+                                        <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
+                                               :src="item.largeIcon ? item.largeIcon : item.iconUrl"
+                                               container=".view-body" width="130"
+                                               height="130" v-if="onLine"></x-img>
+                                        <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                                    </div>
+                                </router-link>
+                                <h3>{{item.name}}</h3>
+                                <p>{{item.downloadTimes | timesFormat}}人使用</p>
+                                <div class="btn-c">
+                                    <btn-download :url="item.downloadUrl"
+                                                  :mini="true"></btn-download>
                                 </div>
-                            </router-link>
-                            <h3>{{item.name}}</h3>
-                            <p>{{item.downloadTimes | timesFormat}}人使用</p>
-                            <div class="btn-c">
-                                <btn-download :pause="item.btnState.pause" :start-load="item.btnState.startLoad"
-                                              :percentage="item.btnState.percentage" :url="item.downloadUrl"
-                                              :mini="true"></btn-download>
-                            </div>
-                        </flexbox-item>
-                    </flexbox>
-                </div>
-            </section>
-            <section class="app-ad" v-if="sameDevApps.length > 0">
-                <h2>大家也喜欢</h2>
-                <div class="app-ad-list">
-                    <flexbox :gutter="0">
-                        <flexbox-item :span="3" class="ad-list-item" v-for="item in sameDevApps" :key="item.id">
-                            <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
-                                <div class="logo-sm-c">
-                                    <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
-                                           :src="item.iconUrl" container="#vux_view_box_body" width="130"
-                                           height="130" v-if="onLine"></x-img>
-                                    <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                            </flexbox-item>
+                        </flexbox>
+                    </div>
+                </section>
+                <section class="app-ad" v-if="sameDevApps.length > 0">
+                    <h2>大家也喜欢</h2>
+                    <div class="app-ad-list">
+                        <flexbox :gutter="0">
+                            <flexbox-item :span="3" class="ad-list-item" v-for="item in sameDevApps" :key="item.id">
+                                <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
+                                    <div class="logo-sm-c">
+                                        <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
+                                               :src="item.largeIcon ? item.largeIcon : item.iconUrl"
+                                               container=".view-body" width="130"
+                                               height="130" v-if="onLine"></x-img>
+                                        <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                                    </div>
+                                </router-link>
+                                <h3>{{item.name}}</h3>
+                                <p>{{item.downloadTimes | timesFormat}}人使用</p>
+                                <div class="btn-c">
+                                    <btn-download :url="item.downloadUrl"
+                                                  :mini="true"></btn-download>
                                 </div>
-                            </router-link>
-                            <h3>{{item.name}}</h3>
-                            <p>{{item.downloadTimes | timesFormat}}人使用</p>
-                            <div class="btn-c">
-                                <btn-download :pause="item.btnState.pause" :start-load="item.btnState.startLoad"
-                                              :percentage="item.btnState.percentage" :url="item.downloadUrl"
-                                              :mini="true"></btn-download>
-                            </div>
-                        </flexbox-item>
-                    </flexbox>
-                </div>
-            </section>
-            <section class="app-other">
-                <h2>其他信息</h2>
-                <p><span>开发者</span><span>{{appList[0].developer}}</span></p>
-            </section>
+                            </flexbox-item>
+                        </flexbox>
+                    </div>
+                </section>
+                <section class="app-other">
+                    <h2>其他信息</h2>
+                    <p><span>开发者</span><span>{{appList[0].developer}}</span></p>
+                </section>
+            </div>
         </template>
-    </view-box>
+    </div>
 </template>
 
 <script>
@@ -158,6 +162,7 @@
             this.$vux.bus.$on('on-line', () => {
                 this.onLine = true
             })
+            // document.title = '应用详情';
         },
         watch: {
             '$route': 'fetchData'
@@ -176,9 +181,10 @@
                         if (data.sameDevApps && Array.isArray(data.sameDevApps)) {
                             this.appList = [...this.appList, ...data.sameDevApps];
                         }
-                        this.$refs.viewBox.scrollTo(0);
                         if (this.appList.length > 0) {
-                            document.title = this.appList[0].name;
+                            const scrollContainer = document.querySelector('.view-body')
+                            scrollContainer && (scrollContainer.scrollTop = 0);
+                            document.title = this.appList[0].name || '应用详情';
                         }
                         /*
                         * 绑定按钮状态响应的data
@@ -284,6 +290,25 @@
     h2 {
         font-size: 28px/@ratio;
         font-weight: normal;
+    }
+
+    .view-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .view-header {
+        flex-shrink: 0;
+    }
+
+    .view-body {
+        transform: translate3d(0, 0, 0);
+        box-sizing: border-box;
+        padding-bottom: 50px;
+        flex: 1;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     //--基本信息
@@ -404,6 +429,8 @@
         overflow-x: auto;
         overflow-y: hidden;
         white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        transform: translate3d(0,0,0);
         .app-images-item {
             display: inline-block;
             font-size: 0;

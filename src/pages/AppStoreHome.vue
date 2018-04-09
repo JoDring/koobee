@@ -63,12 +63,11 @@
             </div>
         </div>
         <refresh-tip v-if="!loading && failLoaded && apps.length === 0" @click.native="getHomeData"></refresh-tip>
-        <loading :show="loading"></loading>
     </div>
 </template>
 
 <script>
-    import {Grid, GridItem, ViewBox, XImg, Marquee, MarqueeItem, Loading} from 'vux'
+    import {Grid, GridItem, Marquee, MarqueeItem} from 'vux'
     import {formatSize} from '../filters'
     import {fetchHome, fetchSearchHotWords} from '../services/appStore'
     import BtnDownload from '../components/btn-download'
@@ -130,18 +129,15 @@
         },
         methods: {
             refresh(done) {
-                this.apps = []
                 this.queryData.pageIndex = 1
-                this.$vux.loading.show()
-                !this.loading && this.getHomeData(done)
+                !this.loading && this.getHomeData(done, true)
             },
             getMore(done) {
                 this.queryData.pageIndex++;
                 !this.loading && this.getHomeData(done)
             },
-            getHomeData(done) {
+            getHomeData(done, refresh) {
                 this.loading = true;
-                this.$vux.loading.hide()
                 return fetchHome(this.queryData).then(res => {
                     this.loading = false;
                     if (typeof done === 'function') {
@@ -151,23 +147,23 @@
                         if (res.data.navbars) {
                             this.navBars = res.data.navbars
                         }
+                        if(refresh) {
+                            this.apps = []
+                        }
                         if (res.data.apps && res.data.apps.length) {
                             this.apps = [...this.apps, ...res.data.apps]
                         } else {
                             if (typeof done === 'function') {
                                 done(true)
                             }
-                            //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                         }
                     }
                 }, () => {
                     this.loading = false
-                    this.$vux.loading.hide()
                     this.failLoaded = true
                     if (typeof done === 'function') {
                         done(true)
                     }
-                    //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                     this.$vux.toast.text('获取数据失败', 'bottom')
                 })
             },
@@ -192,11 +188,8 @@
         components: {
             Grid,
             GridItem,
-            ViewBox,
-            XImg,
             BtnDownload,
             Marquee, MarqueeItem,
-            Loading,
             RefreshTip
         },
         filters: {
@@ -228,6 +221,7 @@
             height: 100%;
             padding-bottom: 50px;
             overflow: auto;
+            transform: translate3d(0,0,0);
             -webkit-overflow-scrolling: touch;
         }
         //---
@@ -252,7 +246,7 @@
             height: 90px;
         }
         .category-title {
-            color: #2222;
+            color: rgba(34,34,34,1);
             font-size: 12px;
         }
         .weui-grid{

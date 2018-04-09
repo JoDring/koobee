@@ -4,9 +4,12 @@
             {{title}}
         </x-header>-->
         <main class="main">
+            <!--<div style="width: 100%; height: 250px" id="aliPlayerContainer"></div>-->
             <div id="information-content" class="information-detail-content">
                 <div v-if="detail" v-html="detail.body"></div>
-                <div v-else style="text-align: center; margin: 40px 0; font-size: 16px">无数据...</div>
+                <refresh-tip v-else-if="!loading && failLoaded"
+                             @click.native="getInformationDetail(id)">
+                </refresh-tip>
             </div>
             <div class="detail-information-list" v-if="sampleList && sampleList.length > 0">
                 <div class="list-item" v-for="item in sampleList" @click="goToDetail(item)">
@@ -35,6 +38,7 @@
     import sampleSize from 'lodash/sampleSize'
     import BtnDownload from '../components/btn-download'
     import AppAd from '../components/AppAd'
+    import RefreshTip from '../components/RefreshTip'
     import {fetchInformationList, fetchInformationDetail} from '../services/appStore'
 
     export default {
@@ -45,6 +49,7 @@
                 loading: false,
                 list: [],
                 app: null,
+                failLoaded: false,
                 onLine: window.navigator.onLine
             }
         },
@@ -83,6 +88,27 @@
                 this.onLine = true;
                 this.refillSrc()
             })
+            // 添加阿里播放器 测试用
+            /*let aliLink = document.createElement('link');
+            aliLink.rel = 'stylesheet';
+            aliLink.href = '//g.alicdn.com/de/prismplayer/2.6.0/skins/default/aliplayer-min.css';
+            let aliScript = document.createElement('script');
+            aliScript.type = 'text/javascript';
+            aliScript.src = '//g.alicdn.com/de/prismplayer/2.6.0/aliplayer-min.js';
+            document.head.appendChild(aliLink)
+            document.head.appendChild(aliScript)
+            this.isAlipayTimmer = setInterval(() => {
+                if (Aliplayer) {
+                    let player = new Aliplayer({
+                        id: 'aliPlayerContainer',
+                        autoplay: false,
+                        width: '100%',
+                        source: '//player.alicdn.com/video/aliyunmedia.mp4',
+                        cover: 'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png'
+                    })
+                    clearInterval(this.isAlipayTimmer)
+                }
+            }, 500)*/
         },
         beforeRouteUpdate(to, from, next) {
             this.getInformationDetail(to.params.id)
@@ -111,7 +137,7 @@
                             })
                         }
                         const list = this.informationList ? this.informationList : this.list
-                        if(list && list.length) {
+                        if (list && list.length) {
                             this.list = list.filter(v => {
                                 return v.id !== this.id
                             })
@@ -123,11 +149,14 @@
                             'source': this.detail.source,
                             'appname': this.detail.appName
                         });
+                    } else {
+                        this.failLoaded = true
                     }
 
                 }, () => {
                     this.loading = false;
                     this.$vux.loading.hide();
+                    this.failLoaded = true;
                     this.$vux.toast.text('加载超时', 'bottom')
                 })
             },
@@ -144,7 +173,7 @@
             },
             removeSrc() {
                 const container = document.getElementById('information-content')
-                if(container) {
+                if (container) {
                     //处理图片
                     this.imgArray = Array.from(container.getElementsByTagName('img'))
                     this.imgArray.forEach(v => {
@@ -163,12 +192,12 @@
 
             },
             refillSrc() {
-                if(this.imgArray) {
+                if (this.imgArray) {
                     this.imgArray.forEach(v => {
                         v.src = v.getAttribute('data-src')
                     })
                 }
-                if(this.iframeArray) {
+                if (this.iframeArray) {
                     this.iframeArray.forEach(v => {
                         v.removeAttribute('sandbox')
                         v.src = '';
@@ -180,7 +209,8 @@
         components: {
             XHeader,
             BtnDownload,
-            AppAd
+            AppAd,
+            RefreshTip
         }
     }
 </script>
@@ -197,6 +227,7 @@
         height: 100%;
         font-size: 15px;
         color: #222;
+        background: #f5f5f5;
         display: flex;
         flex-direction: column;
         .vux-header {
@@ -205,13 +236,14 @@
         .main {
             flex: 1;
             overflow: auto;
-            -webkit-overflow-scrolling: touch;
+            transform: translate3d(0, 0, 0);
             position: relative;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
         }
         //-- 详情
         .information-detail-content {
             padding: 17px 12px;
-            background: #f5f5f5;
             color: #313736;
             line-height: 1.8;
             text-align: justify;
@@ -219,7 +251,7 @@
             p {
                 font-size: 15px;
                 color: #313736;
-                & + p{
+                & + p {
                     margin-top: 20px;
                 }
             }
@@ -234,7 +266,7 @@
                 max-width: 100%;
                 background: #eee;
             }
-            iframe{
+            iframe {
                 max-width: 100% !important;
                 height: auto !important;
                 margin-top: 10px;
@@ -242,7 +274,7 @@
             }
             .Mid2L_title {
                 text-align: left;
-                h1{
+                h1 {
                     display: inline-block;
                     text-align: left;
                 }
@@ -274,7 +306,7 @@
                     .setTopLine(#e4e4e4)
                 }
                 &:first-child:before {
-                    border-top-color:#cacaca;
+                    border-top-color: #cacaca;
                 }
                 &:active {
                     background-color: #eee;

@@ -40,13 +40,21 @@
                     <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
                 </div>
             </scroller>
+            <div v-if="loading && showSpinner"
+                 style="width: 100%; height: 100%;
+                 position: absolute; z-index: 999;
+                 top: 0;left: 0; display: flex;
+                  justify-content: center; align-items: center">
+                <spinner type="android"></spinner>
+            </div>
         </main>
-        <refresh-tip v-if="!loading && failLoaded && apps.length === 0" @click.native="refresh"></refresh-tip>
+        <refresh-tip v-if="!loading && failLoaded && apps.length === 0"
+                     @click.native="refresh(null, true)"></refresh-tip>
     </div>
 </template>
 
 <script>
-    import {XHeader} from 'vux'
+    import {XHeader, Spinner} from 'vux'
     import BtnDownload from '../components/btn-download'
     import RefreshTip from '../components/RefreshTip'
     import {formatSize} from '../filters'
@@ -60,6 +68,7 @@
                 apps: [],
                 hotWords: null,
                 loading: false,
+                showSpinner: true,
                 failLoaded: false,
                 queryData: {
                     catId: '',
@@ -81,9 +90,6 @@
             type: {
                 type: String
             },
-            catId: {
-                type: String || Number
-            },
             title: {
                 type: String
             }
@@ -98,34 +104,34 @@
                 }
             },
             myTitle() {
-                if(this.apps[0]) {
-                    if(this.apps[0].categoryName) {
+                if (this.apps[0]) {
+                    if (this.apps[0].categoryName) {
                         return this.apps[0].categoryName
                     } else {
                         return this.typeMap[this.type]
                     }
                 } else {
-                    return ' '
+                    return ''
                 }
             }
         },
         watch: {
             'type': function () {
-                this.refresh()
+                this.apps = []
+                !this.loading && this.refresh(null, true)
             },
-            'catId': function () {
-                this.refresh()
+            'myTitle': function () {
+                document.title = this.title ? this.title : this.myTitle;
             }
         },
         beforeRouteEnter(to, from, next) {
-            document.title = to.meta.title
             next(vm => {
                 setTimeout(function () {
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
                 }, 250)
                 setTimeout(function () {
                     vm.showScrollerMask = false
-                }, 450)
+                }, 500)
             })
         },
         beforeRouteLeave(to, from, next) {
@@ -137,9 +143,9 @@
             next()
         },
         created() {
+            this.showSpinner = true
             this.getApps()
             this.getHotWords()
-            document.title = '应用分类:' + this.title;
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
             })
@@ -148,22 +154,19 @@
             })
         },
         methods: {
-            getApps(done) {
+            getApps(done, refresh) {
                 switch (this.type) {
-                    case 'categoryList':
-                        this.getCategoryList(done)
-                        break;
                     case 'need':
-                        this.getNeed(done)
+                        this.getNeed(done, refresh)
                         break;
                     case 'rank':
-                        this.getRank(done)
+                        this.getRank(done, refresh)
                         break;
                     case 'game':
-                        this.getGame(done)
+                        this.getGame(done, refresh)
                         break;
                     default:
-                        return;
+                        this.getCategoryList(done, refresh)
                 }
             },
             getHotWords() {
@@ -174,72 +177,72 @@
                 })
             },
             //根据详情分类id获取详情
-            getCategoryList(done) {
+            getCategoryList(done, refresh) {
                 this.loading = true;
-                this.queryData.catId = this.catId
+                this.queryData.catId = this.type
                 return fetchCategoryList(this.queryData).then(res => {
-                    this.successCb(res, done)
+                    this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
                 })
             },
-            getRank(done) {
+            getRank(done, refresh) {
                 this.loading = true;
                 delete this.queryData.catId
                 return fetchRank(this.queryData).then(res => {
-                    this.successCb(res, done)
+                    this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
                 })
             },
-            getNeed(done) {
+            getNeed(done, refresh) {
                 this.loading = true;
                 delete this.queryData.catId
                 return fetchNeed(this.queryData).then(res => {
-                    this.successCb(res, done)
+                    this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
                 })
             },
-            getGame(done) {
+            getGame(done, refresh) {
                 this.loading = true;
                 delete this.queryData.catId
                 return fetchGame(this.queryData).then(res => {
-                    this.successCb(res, done)
+                    this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
                 })
             },
-            successCb(res, done) {
+            successCb(res, done, refresh) {
                 if (typeof done === 'function') {
                     done()
                 }
                 this.loading = false
-                this.$vux.loading.hide()
+                this.showScrollerMask = false
+                if (refresh) {
+                    this.apps = []
+                }
                 if (res.data && res.data.apps && res.data.apps.length) {
                     this.apps = [...this.apps, ...res.data.apps]
                 } else {
                     if (typeof done === 'function') {
                         done(true)
                     }
-                    //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                 }
             },
             failCb(done) {
                 this.loading = false
-                this.$vux.loading.hide()
+                this.showScrollerMask = false
                 this.failLoaded = true
                 if (typeof done === 'function') {
                     done(true)
                 }
-                //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                 this.$vux.toast.text('加载超时', 'bottom')
             },
-            refresh(done) {
-                this.apps = []
+            refresh(done, showSpinner) {
+                this.showSpinner = showSpinner ? showSpinner : false
                 this.queryData.pageIndex = 1
-                this.$vux.loading.show()
-                this.getApps(done)
+                this.getApps(done, true)
             },
             getMore(done) {
                 this.queryData.pageIndex++
@@ -253,7 +256,8 @@
         components: {
             XHeader,
             BtnDownload,
-            RefreshTip
+            RefreshTip,
+            Spinner
         },
         filters: {
             formatSize
@@ -284,6 +288,8 @@
             flex: 1;
             overflow: auto;
             position: relative;
+            transform: translate3d(0, 0, 0);
+            -webkit-overflow-scrolling: touch;
         }
         //-- 详情列表
         .list-detail {

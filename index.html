@@ -1,88 +1,99 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="shortcut icon" href="./static/favicon.ico">
-  <title>努力加载中...</title>
-  <style type="text/css">
-    .elm-spinner {
-      height: 300px;
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-box-align: end;
-      -webkit-align-items: flex-end;
-      align-items: flex-end;
-      -webkit-box-pack: center;
-      -webkit-justify-content: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-    }
-    .elm-spinner:after {
-      display: block;
-      content: '';
-      width: 25.24px;
-      height: 25.24px;
-      -webkit-animation: spinner .5s infinite linear;
-      animation: spinner .5s infinite linear;
-      border-left: .853px solid transparent;
-      border-left: .053333rem solid transparent;
-      border-right: .853px solid transparent;
-      border-right: .053333rem solid transparent;
-      border-bottom: .853px solid transparent;
-      border-bottom: .053333rem solid transparent;
-      border-top: .853px solid #2395ff;
-      border-top: .053333rem solid #2395ff;
-      border-radius: 100%;
-    }
-    @-webkit-keyframes spinner {
-      from {
-        -webkit-transform: rotate(0);
-        transform: rotate(0)
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="./static/favicon.ico">
+    <title>努力加载中...</title>
+    <style type="text/css">
+        .elm-spinner {
+            height: 300px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: end;
+            -webkit-align-items: flex-end;
+            align-items: flex-end;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+        .elm-spinner:after {
+            display: block;
+            content: '';
+            width: 25.24px;
+            height: 25.24px;
+            -webkit-animation: spinner .5s infinite linear;
+            animation: spinner .5s infinite linear;
+            border-left: .853px solid transparent;
+            border-left: .053333rem solid transparent;
+            border-right: .853px solid transparent;
+            border-right: .053333rem solid transparent;
+            border-bottom: .853px solid transparent;
+            border-bottom: .053333rem solid transparent;
+            border-top: .853px solid #2395ff;
+            border-top: .053333rem solid #2395ff;
+            border-radius: 100%;
+        }
+        @-webkit-keyframes spinner {
+            from {
+                -webkit-transform: rotate(0);
+                transform: rotate(0)
+            }
 
-      to {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg)
-      }
-    }
-    @keyframes spinner {
-      from {
-        -webkit-transform: rotate(0);
-        transform: rotate(0)
-      }
+            to {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg)
+            }
+        }
+        @keyframes spinner {
+            from {
+                -webkit-transform: rotate(0);
+                transform: rotate(0)
+            }
 
-      to {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg)
-      }
-    }
-  </style>
+            to {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg)
+            }
+        }
+    </style>
 </head>
 <body>
 <div id="app">
-  <div class="elm-spinner"></div>
+    <div class="elm-spinner"></div>
 </div>
 <%=htmlWebpackPlugin.files.webpackManifest%>
-<!--<script async type="text/javascript" src="http://pingjs.qq.com/h5/stats.js" name="MTAH5" sid="500397080" cid="500397118"></script>-->
-<!--<script async type="text/javascript" src="https://cdn.staticfile.org/babel-polyfill/6.16.0/polyfill.min.js"></script>-->
 <script>
-  //to app
-  window.javaCallJsChangeStatus = function () {}
-  var _mtac = {"performanceMonitor":1};
-  (function() {
-      let mta = document.createElement("script");
-      mta.src = "http://pingjs.qq.com/h5/stats.js?v2.0.4";
-      mta.setAttribute("name", "MTAH5");
-      mta.setAttribute("async", true);
-      mta.setAttribute("sid", "500397080");
-      mta.setAttribute("cid", "500397118");
-      let s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(mta, s);
-  })();
+    //app可能需要
+    window.javaCallJsChangeStatus = function () {
+    }
+    //统计第三方js
+    var _mtac = {"performanceMonitor": 1};
+    (function () {
+        let mta = document.createElement("script");
+        mta.src = "http://pingjs.qq.com/h5/stats.js?v2.0.4";
+        mta.setAttribute("name", "MTAH5");
+        mta.setAttribute("async", true);
+        mta.setAttribute("sid", "500397080");
+        mta.setAttribute("cid", "500397118");
+        let s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(mta, s);
+    })();
+    //隐藏服务器恶意广告
+    setTimeout(function () {
+        let adDiv1 = document.querySelector('[id^="chunasqwd"]')
+        if (adDiv1) {
+            adDiv1.style.display = 'none'
+        }
+        let adDiv2 = document.querySelector('[id^="_embed"]')
+        if (adDiv2) {
+            adDiv2.style.display = 'none'
+        }
+    }, 250)
 </script>
 </body>
 </html>

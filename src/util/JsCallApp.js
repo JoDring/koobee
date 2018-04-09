@@ -203,7 +203,8 @@ const JsCallApp = (function(){
 	*/
 	function getApplicationName(){
 		if(!window.jsObj || !window.jsObj.jsCallGetApplicationName){
-			showUpdateAppstoreNotice();
+			//showUpdateAppstoreNotice();
+			return null
 		}
 		return window.jsObj.jsCallGetApplicationName();
 	}
@@ -226,7 +227,7 @@ const JsCallApp = (function(){
 		requestServerByAsync,  //代理加密请求  异步
 		transferParam, //单纯将参数传递致客户端app
 		showUpdateAppstoreNotice, //弹窗更新
-        getApplicationName //弹窗更新
+        getApplicationName //获取当前应用appstore  gamecenter
 	};
 })();
 

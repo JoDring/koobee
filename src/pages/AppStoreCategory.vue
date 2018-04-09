@@ -11,7 +11,7 @@
                 <div class="list-title">游戏分类</div>
                 <grid :cols="2">
                     <grid-item
-                            :link="{name: 'AppStoreList', append: false, params: {type: 'categoryList', catId: '-' + item.id, title: item.typeName}}"
+                            :link="{name: 'AppStoreApps', append: false, params: {type: '-' + item.id, title: item.typeName}}"
                             class="list-item" v-for="item in list.game_cat"
                             :key="item.id">
                         <div class="list-item-img-c"><img class="list-item-img" :src="item.icon"></div>
@@ -21,7 +21,7 @@
                 <div class="list-title">应用分类</div>
                 <grid :cols="2">
                     <grid-item
-                            :link="{name: 'AppStoreList', append: false, params: {type: 'categoryList', catId: '-' + item.id, title: item.typeName}}"
+                            :link="{name: 'AppStoreApps', append: false, params: {type: '-' + item.id, title: item.typeName}}"
                             class="list-item" v-for="item in list.app_cat"
                             :key="item.id">
                         <div class="list-item-img-c">
@@ -122,7 +122,16 @@
             height: 100%;
             flex: 1;
             overflow: auto;
+            transform: translate3d(0,0,0);
             -webkit-overflow-scrolling: touch;
+        }
+        //--
+        .weui-grids {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .weui-grid{
+            float: none;
         }
         //--
         .list-title {

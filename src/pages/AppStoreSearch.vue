@@ -3,7 +3,7 @@
         <div class="header">
             <x-icon class="header-icon" type="ios-arrow-left" size="25" @click.native="$router.go(-1)"></x-icon>
             <div class="search-input-c">
-                <input id="search-input" type="text" class="search-input" v-model="queryData.query"
+                <input v-focus id="search-input" type="text" class="search-input" v-model="queryData.query"
                        :placeholder="hotWord">
                 <label v-show="queryData.query" @click="queryData.query = ''" for="search-input">
                     <x-icon class="icon-close" type="ios-close" size="22"></x-icon>
@@ -98,12 +98,16 @@
             <div v-else-if="searchResult &&  !searchResult.apps.length">
                 <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">未找到匹配应用</div>
             </div>
+            <div v-if="loading && showSpinner" style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+                <spinner type="android"></spinner>
+            </div>
         </main>
     </div>
 </template>
 
 <script>
     import debounce from 'lodash/debounce'
+    import {Spinner} from 'vux'
     import {formatSize} from '../filters'
     import BtnDownload from '../components/btn-download'
     import {fetchSearchHotWords, fetchSearchMatch, fetchSearchResult} from '../services/appStore'
@@ -122,6 +126,7 @@
                 searchMatch: {data: null},
                 searchResult: null,
                 loading: false,
+                showSpinner: true,
                 title: '应用搜索',
                 historySearchWords: this.getCacheHistory() ? this.getCacheHistory() : [],
                 onLine: window.navigator.onLine,
@@ -137,6 +142,7 @@
         },
         watch: {
             'queryData.query': function (newValue) {
+                this.showSpinner = true
                 if (this.hotWords.length && !newValue) {
                     this.showHotWords = true
                     this.searchMatch = null
@@ -187,31 +193,29 @@
         },
         methods: {
             getHotWords() {
-                this.$vux.loading.show();
                 fetchSearchHotWords().then(res => {
-                    this.$vux.loading.hide();
                     if (res.code === '0') {
                         this.hotWords = res.data.hotwords
                         this.hotWords.length = 8
                     }
-                }, () => {
-                    this.$vux.loading.hide();
                 })
             },
             getMatch: debounce(function () {
-                this.$vux.loading.show();
+                this.loading = true
                 fetchSearchMatch(this.queryData).then(res => {
-                    this.$vux.loading.hide();
+                    this.loading = false
                     if (res.code === '0') {
                         this.searchMatch = res
                     }
                     document.querySelector('.main').scrollTop = 0
                 }, () => {
-                    this.$vux.loading.hide();
+                    this.loading = false
                 })
             }, 500),
-            getResult(done) {
-                this.$vux.loading.show();
+            getResult(done, refresh) {
+                if(this.inputEl) {
+                    this.inputEl.blur()
+                }
                 this.loading = true;
                 this.searchMatch = null
                 this.queryData.query = this.queryData.query ? this.queryData.query : this.hotWord;
@@ -219,15 +223,16 @@
                     if (typeof done === 'function') {
                         done()
                     }
-                    this.$vux.loading.hide();
                     this.loading = false
+                    if(refresh) {
+                        this.searchResult = null
+                    }
                     if (res.code === '0') {
                         this.searchResult = res.data
                     }
                     // 保存搜索历史
                     this.setCacheHistory(this.queryData.query);
                 }, () => {
-                    this.$vux.loading.hide();
                     this.loading = false
                 })
             },
@@ -259,9 +264,9 @@
                 window.localStorage.removeItem('historySearchWordsFromAppStore')
             },
             refresh(done) {
-                this.searchResult = null
+                this.showSpinner = false
                 this.queryData.pageIndex = 1
-                this.getResult(done)
+                this.getResult(done, true)
             },
             getMore(done) {
                 this.queryData.pageIndex++
@@ -295,10 +300,18 @@
             }
         },
         components: {
-            BtnDownload
+            BtnDownload,
+            Spinner
         },
         filters: {
             formatSize
+        },
+        directives: {
+            focus: {
+                inserted: function (el) {
+                    el.focus()
+                }
+            }
         }
     }
 </script>
@@ -364,6 +377,7 @@
             flex: 1;
             position: relative;
             overflow: auto;
+            transform: translate3d(0,0,0);
             -webkit-overflow-scrolling: touch;
         }
         //---
@@ -467,6 +481,9 @@
             .match-item {
                 display: flex;
                 align-items: center;
+                &:active {
+                    background-color: #fff;
+                }
             }
         }
         //---

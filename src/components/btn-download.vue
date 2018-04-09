@@ -43,9 +43,10 @@
                         type: 'text',
                         position: 'top'
                     })
+                    return
                 }
                 if(!window.jsObj) {
-                    window.location.href = url;
+                    window.open(url);
                 } else {
                     this.$emit('click')
                 }

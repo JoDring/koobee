@@ -215,9 +215,9 @@
     import LotteryGrid from './Lottery-grid.vue'; //抽奖宫格
 
     import JsCallApp, {appState} from '../util/JsCallApp'; //客户端api
-    const recordsUrl = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/records?id=' : 'http://192.168.1.148:8080/appstore/web/api/records?id=';
-    const myAwardUrl = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/myawards' : 'http://192.168.1.148:8080/appstore/web/api/myawards';
-    const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/detail?id=' : 'http://192.168.1.148:8080/appstore/web/api/detail?id=';
+    const recordsUrl = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/records?id=' : 'http://192.168.1.148:8090/appstore/web/api/records?id=';
+    const myAwardUrl = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/myawards' : 'http://192.168.1.148:8090/appstore/web/api/myawards';
+    const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/web/api/detail?id=' : 'http://192.168.1.148:8090/appstore/web/api/detail?id=';
 
     // for debugger
     function alertObj(obj) {
@@ -848,7 +848,7 @@
                 this.clickTimes++;
                 if (this.clickTimes === 6) {
                     localStorage.clear();
-                    this.$http.get('http://192.168.1.148:8080/appstore/record/clear');
+                    this.$http.get('http://192.168.1.148:8090/appstore/record/clear');
                     window.jsObj && JsCallApp.alertAToast('reset done!');
                     this.clickTimes = 0;
                     window.location.reload();

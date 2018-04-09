@@ -44,13 +44,6 @@ export default new Router({
             props: true
         },
         {
-            path: '/AppStoreApps/:type/:catId',
-            name: 'AppStoreList',
-            meta:{title: '应用详情'},
-            component: AppStoreApps,
-            props: true
-        },
-        {
             path: '/AppDetail/:appId',
             name: 'AppDetail',
             component: AppDetail,

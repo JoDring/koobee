@@ -142,25 +142,26 @@
                 }, 250)
                 setTimeout(function () {
                     vm.showScrollerMask = false
-                }, 450)
+                }, 500)
             })
         },
         methods: {
             //根据详情分类id获取详情
-            getInformationList(done) {
+            getInformationList(done, refresh) {
                 this.loading = true;
+                this.showSpinner = true
                 return fetchInformationList(this.queryData).then(res => {
-                    this.successCb(res, done)
+                    this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
                 })
             },
-            successCb(res, done) {
+            successCb(res, done, refresh) {
                 if (typeof done === 'function') {
                     done()
                 }
                 this.loading = false
-                this.$vux.loading.hide()
+                this.showScrollerMask = false
                 if (res.data) {
                     if (this.queryData.pageIndex === 1) {
                         if (res.data.regions) {
@@ -172,27 +173,30 @@
                     if (res.data.app) {
                         this.app = res.data.app
                     }
+                    if(refresh) {
+                        this.list = []
+                    }
                     if (res.data.list && res.data.list.length) {
                         this.list = [...this.list, ...res.data.list]
                     } else {
-                        done(true)
-                        //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
+                        if (typeof done === 'function') {
+                            done(true)
+                        }
                     }
                 }
             },
             failCb(done) {
                 this.loading = false
-                this.$vux.loading.hide()
+                this.showScrollerMask = false
                 this.failLoaded = true
-                done(true)
-                //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite()
+                if (typeof done === 'function') {
+                    done(true)
+                }
                 this.$vux.toast.text('加载超时', 'bottom')
             },
-            refresh(done) {
-                this.$vux.loading.show()
-                this.list = []
+            refresh(done, refresh) {
                 this.queryData.pageIndex = 1
-                !this.loading && this.getInformationList(done)
+                !this.loading && this.getInformationList(done, refresh)
             },
             getMore(done) {
                 this.queryData.pageIndex++
@@ -288,7 +292,9 @@
         .list {
             flex: 1;
             overflow: auto;
+            transform: translate3d(0,0,0);
             position: relative;
+            -webkit-overflow-scrolling: touch;
         }
         .list-detail {
             .list-item-c {
