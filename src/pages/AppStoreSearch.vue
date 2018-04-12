@@ -3,13 +3,13 @@
         <div class="header">
             <x-icon class="header-icon" type="ios-arrow-left" size="25" @click.native="$router.go(-1)"></x-icon>
             <div class="search-input-c">
-                <input v-focus id="search-input" type="text" class="search-input" v-model="queryData.query"
+                <input v-focus @focus="showHistorySearchWords = true" id="search-input" type="text" class="search-input" v-model="queryData.query"
                        :placeholder="hotWord">
-                <label v-show="queryData.query" @click="queryData.query = ''" for="search-input">
+                <label v-show="queryData.query" @click="(showHistorySearchWords = true) && (queryData.query = '')" for="search-input">
                     <x-icon class="icon-close" type="ios-close" size="22"></x-icon>
                 </label>
             </div>
-            <x-icon class="header-icon" type="ios-search" size="22" @click.native="getResult"></x-icon>
+            <x-icon class="header-icon" type="ios-search" size="22" @click.native="refresh"></x-icon>
         </div>
         <main class="main">
             <!--热门搜索-->
@@ -20,7 +20,8 @@
                 </div>
             </div>
             <!--match列表-->
-            <div class="list-match" v-if="searchMatch">
+            <div class="list-match" v-else-if="searchMatch">
+                <!--输入匹配 app-->
                 <div v-if="searchMatch.data && searchMatch.data.app && searchMatch.data.app.id"
                      class="list-match-item">
                     <router-link
@@ -37,7 +38,8 @@
                     <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl"
                                   btnText="下载"></btn-download>
                 </div>
-                <div v-if="historySearchWords.length && !showHotWords" class="history-search-list">
+                <!--历史-->
+                <div v-if="showHistorySearchWords && historySearchWords.length && !showHotWords && !searchResult" class="history-search-list">
                     <div class="history-search-delete" @click="clearHistoryWords">
                         <x-icon class="search-delete-icon" size="23" type="ios-close"></x-icon>
                     </div>
@@ -49,6 +51,7 @@
                         {{item}}
                     </div>
                 </div>
+                <!--输入匹配 关键字-->
                 <div v-if="searchMatch.data && searchMatch.data.items && searchMatch.data.items.length">
                     <div class="match-item"
                          @click="setQuery(item)"
@@ -98,10 +101,11 @@
             <div v-else-if="searchResult &&  !searchResult.apps.length">
                 <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">未找到匹配应用</div>
             </div>
-            <div v-if="loading && showSpinner" style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
-                <spinner type="android"></spinner>
-            </div>
         </main>
+        <!--loading spinner-->
+        <div v-show="loading && showSpinner" style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+            <spinner type="android"></spinner>
+        </div>
     </div>
 </template>
 
@@ -129,6 +133,7 @@
                 showSpinner: true,
                 title: '应用搜索',
                 historySearchWords: this.getCacheHistory() ? this.getCacheHistory() : [],
+                showHistorySearchWords: true,
                 onLine: window.navigator.onLine,
                 scrollPosition: {x: 0, y: 0, animate: false},
                 showScrollerMask: false
@@ -148,6 +153,7 @@
                     this.searchMatch = null
                     this.searchResult = null
                 } else {
+                    this.showHotWords = false
                     this.searchResult = null
                     !this.loading && this.getMatch()
                 }
@@ -189,6 +195,9 @@
                 this.scrollPosition = {x: 0, y: position.top, animate: false}
             }
             this.showScrollerMask = true
+            if(to.name !== 'AppDetail') {
+                this.queryData.query = ''
+            }
             next()
         },
         methods: {
@@ -202,6 +211,7 @@
             },
             getMatch: debounce(function () {
                 this.loading = true
+                this.showSpinner = true
                 fetchSearchMatch(this.queryData).then(res => {
                     this.loading = false
                     if (res.code === '0') {
@@ -216,8 +226,13 @@
                 if(this.inputEl) {
                     this.inputEl.blur()
                 }
+                if(!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    return
+                }
                 this.loading = true;
-                this.searchMatch = null
+                this.searchMatch.data = null
+                this.showHistorySearchWords = false
                 this.queryData.query = this.queryData.query ? this.queryData.query : this.hotWord;
                 fetchSearchResult(this.queryData).then(res => {
                     if (typeof done === 'function') {
@@ -239,6 +254,7 @@
             handleHotWordClick(data) {
                 this.queryData.query = data;
                 this.showHotWords = false
+                this.showHistorySearchWords = false
             },
             setCacheHistory(word) {
                 if (word && word.trim()) {
@@ -248,7 +264,10 @@
                     if (exist) {
                         return
                     }
-                    this.historySearchWords.push(word)
+                    this.historySearchWords.unshift(word)
+                    if(this.historySearchWords.length > 8) {
+                        this.historySearchWords.length = 8
+                    }
                     const words = JSON.stringify(this.historySearchWords)
                     window.localStorage.setItem('historySearchWordsFromAppStore', words)
                 }
@@ -271,11 +290,13 @@
             getMore(done) {
                 this.queryData.pageIndex++
                 this.loading = true;
+                this.showSpinner = false;
                 fetchSearchResult(this.queryData).then(res => {
                     if (typeof done === 'function') {
                         done()
                     }
                     this.loading = false
+                    this.showSpinner = true;
                     if (res.code === '0') {
                         if (res.data.apps && res.data.apps.length) {
                             this.searchResult.apps = [...this.searchResult.apps, ...res.data.apps]
@@ -292,6 +313,7 @@
                     }
                     //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                     this.loading = false
+                    this.showSpinner = true;
                 })
 
             },

@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </div>
-                <router-link :to="{name:'InformationList'}" class="list-bottom-btn">查看更多</router-link>
+                <router-link :to="{name:'InformationList', params: {resetScroller: true}}" class="list-bottom-btn">查看更多</router-link>
             </div>
         </main>
         <app-ad v-if="app" :app="app"></app-ad>

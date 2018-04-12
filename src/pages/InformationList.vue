@@ -4,12 +4,11 @@
             {{pageTitle}}
         </x-header>-->
         <div class="information-regions" v-show="regions && regions.length">
-            <router-link :to="{name: 'InformationList', query: {packageName: item.packageName}}"
-                         class="regions-item" v-for="item in regions" :key="item.id">
+            <div @click="goToPackageList(item)" class="regions-item" v-for="item in regions" :key="item.id">
                 <img class="regions-item-img" v-lazy="item.imageUrl">
                 <div>{{item.title}}</div>
                 <div class="regions-item-btn">进入</div>
-            </router-link>
+            </div>
         </div>
         <div class="list">
             <transition name="vux-fade">
@@ -104,6 +103,10 @@
             title: {
                 type: String,
                 default: '热门资讯'
+            },
+            resetScroller: {
+                type: Boolean,
+                default: null
             }
         },
         computed: {
@@ -138,7 +141,11 @@
         beforeRouteEnter(to, from, next) {
             next(vm => {
                 setTimeout(function () {
-                    vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true);
+                    if (vm.resetScroller) {
+                        vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, 0, true);
+                    } else {
+                        vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true);
+                    }
                 }, 250)
                 setTimeout(function () {
                     vm.showScrollerMask = false
@@ -173,7 +180,7 @@
                     if (res.data.app) {
                         this.app = res.data.app
                     }
-                    if(refresh) {
+                    if (refresh) {
                         this.list = []
                     }
                     if (res.data.list && res.data.list.length) {
@@ -194,7 +201,7 @@
                 }
                 this.$vux.toast.text('加载超时', 'bottom')
             },
-            refresh(done, refresh) {
+            refresh(done, refresh = true) {
                 this.queryData.pageIndex = 1
                 !this.loading && this.getInformationList(done, refresh)
             },
@@ -220,6 +227,12 @@
                     this.scrollPosition = {x: 0, y: position.top, animate: false}
                 }
                 this.showScrollerMask = true
+            },
+            goToPackageList(item) {
+                this.$router.push({
+                    name: 'InformationList',
+                    query: {packageName: item.packageName}
+                })
             }
 
         },
@@ -292,7 +305,7 @@
         .list {
             flex: 1;
             overflow: auto;
-            transform: translate3d(0,0,0);
+            transform: translate3d(0, 0, 0);
             position: relative;
             -webkit-overflow-scrolling: touch;
         }

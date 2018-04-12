@@ -239,12 +239,13 @@
                 }
                 this.$vux.toast.text('加载超时', 'bottom')
             },
-            refresh(done, showSpinner) {
-                this.showSpinner = showSpinner ? showSpinner : false
+            refresh(done, showSpinner = false) {
+                this.showSpinner = showSpinner
                 this.queryData.pageIndex = 1
                 this.getApps(done, true)
             },
             getMore(done) {
+                this.showSpinner = false
                 this.queryData.pageIndex++
                 !this.loading && this.getApps(done)
             },
