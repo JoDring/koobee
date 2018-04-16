@@ -32,22 +32,30 @@
                     </grid-item>
                 </grid>
             </template>
+            <refresh-tip v-if="!loading && failLoaded && !list" @click.native="getCategory"></refresh-tip>
         </main>
+        <!--loading spinner-->
+        <div v-if="loading"
+             style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+            <spinner type="android"></spinner>
+        </div>
     </div>
 </template>
 
 <script>
-    import {XHeader, Grid, GridItem} from 'vux'
+    import {XHeader, Grid, GridItem, Spinner} from 'vux'
     import sample from 'lodash/sample'
     import {fetchCategory, fetchSearchHotWords} from '../services/appStore'
-
+    import RefreshTip from '../components/RefreshTip'
     export default {
         name: "app-store-category",
         data() {
             return {
                 list: null,
                 hotWords: null,
-                onLine: window.navigator.onLine
+                onLine: window.navigator.onLine,
+                loading: false,
+                failLoaded: false
             }
         },
         computed: {
@@ -61,7 +69,6 @@
             }
         },
         created() {
-            document.title = '应用分类';
             this.getCategory().then(
                 fetchSearchHotWords().then(res => {
                     if (res.code === '0') {
@@ -77,16 +84,20 @@
             })
         },
         beforeRouteEnter(to, from, next) {
-            document.title = to.meta.title
+            document.title = '应用分类'
             next()
         },
         methods: {
             getCategory() {
+                this.loading = true
                 return fetchCategory().then(res => {
+                    this.loading = false
                     if (res.code === '0') {
                         this.list = res.data
                     }
                 }, () => {
+                    this.loading = false
+                    this.failLoaded = true
                     this.$vux.toast.text('获取数据失败', 'bottom')
                 })
             }
@@ -94,7 +105,9 @@
         },
         components: {
             XHeader,
-            Grid, GridItem
+            Grid, GridItem,
+            RefreshTip,
+            Spinner
         }
     }
 </script>

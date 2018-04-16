@@ -122,6 +122,7 @@
                 this.$vux.loading.show();
                 return fetchInformationDetail({id: appId}).then(res => {
                     this.loading = false;
+                    document.title = this.title
                     this.$vux.loading.hide();
                     if (res.code === '0') {
                         this.detail = res.data.detail
@@ -271,6 +272,10 @@
                 height: auto !important;
                 margin-top: 10px;
                 background: #000;
+            }
+            embed{
+                display: none !important;
+                max-width: 100% !important;
             }
             .Mid2L_title {
                 text-align: left;

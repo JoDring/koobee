@@ -3,24 +3,32 @@
         <div class="header">
             <x-icon class="header-icon" type="ios-arrow-left" size="25" @click.native="$router.go(-1)"></x-icon>
             <div class="search-input-c">
-                <input v-focus @focus="showHistorySearchWords = true" id="search-input" type="text" class="search-input" v-model="queryData.query"
-                       :placeholder="hotWord">
-                <label v-show="queryData.query" @click="(showHistorySearchWords = true) && (queryData.query = '')" for="search-input">
+                <input v-focus
+                       autocomplete="off"
+                       type="search"
+                       @focus="showHistorySearchWords = true"
+                       @keyup.enter="refresh"
+                       id="search-input"
+                       class="search-input"
+                       v-model.trim="queryData.query"
+                       :placeholder="hotWord" ref="searchInput">
+                <label v-show="queryData.query" @click="(showHistorySearchWords = true) && (queryData.query = '')"
+                       for="search-input">
                     <x-icon class="icon-close" type="ios-close" size="22"></x-icon>
                 </label>
             </div>
-            <x-icon class="header-icon" type="ios-search" size="22" @click.native="refresh"></x-icon>
+            <x-icon class="header-icon" type="ios-search" size="22" @click.native="handleSearch"></x-icon>
         </div>
         <main class="main">
             <!--热门搜索-->
-            <div class="hot-words" v-if="hotWords.length && showHotWords && !queryData.query && !searchResult">
+            <div class="hot-words" v-if="hotWords.length && showHotWords && !searchResult">
                 <div class="hot-word-title">热门搜索</div>
-                <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item.searchWord)">
+                <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item)">
                     {{item.searchWord}}
                 </div>
             </div>
             <!--match列表-->
-            <div class="list-match" v-else-if="searchMatch">
+            <div class="list-match" v-else-if="showMatch && searchMatch && searchMatch.data">
                 <!--输入匹配 app-->
                 <div v-if="searchMatch.data && searchMatch.data.app && searchMatch.data.app.id"
                      class="list-match-item">
@@ -36,10 +44,12 @@
                         </div>
                     </router-link>
                     <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl"
-                                  btnText="下载"></btn-download>
+                                  btnText="下载">
+                    </btn-download>
                 </div>
                 <!--历史-->
-                <div v-if="showHistorySearchWords && historySearchWords.length && !showHotWords && !searchResult" class="history-search-list">
+                <div v-if="showHistorySearchWords && historySearchWords.length && !showHotWords && !searchResult"
+                     class="history-search-list">
                     <div class="history-search-delete" @click="clearHistoryWords">
                         <x-icon class="search-delete-icon" size="23" type="ios-close"></x-icon>
                     </div>
@@ -66,23 +76,12 @@
                 </div>
             </div>
             <!--result列表-->
-            <transition name="vux-fade">
-                <div class="my-scroller-mask"
-                     style="position: absolute;
-                            z-index: 9;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: #fff;"
-                     v-show="showScrollerMask"></div>
-            </transition>
             <scroller
                     class="list-result"
                     ref="scroller"
                     :on-refresh="refresh"
                     :on-infinite="getMore"
-                    v-if="searchResult && searchResult.apps && searchResult.apps.length">
+                    v-else-if="searchResult && searchResult.apps && searchResult.apps.length">
                 <div class="list-item" v-for="item in searchResult.apps" :key="item.id">
                     <div @click="goToDetail(item)" class="list-item-c">
                         <div class="list-item-icon-c">
@@ -101,9 +100,21 @@
             <div v-else-if="searchResult &&  !searchResult.apps.length">
                 <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">未找到匹配应用</div>
             </div>
+            <transition name="vux-fade">
+                <div class="my-scroller-mask"
+                     style="position: absolute;
+                            z-index: 9;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: #fff;"
+                     v-show="showScrollerMask"></div>
+            </transition>
         </main>
         <!--loading spinner-->
-        <div v-show="loading && showSpinner" style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+        <div v-show="loading && showSpinner"
+             style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
             <spinner type="android"></spinner>
         </div>
     </div>
@@ -127,6 +138,7 @@
                 },
                 hotWords: [],
                 showHotWords: true,
+                showMatch: true,
                 searchMatch: {data: null},
                 searchResult: null,
                 loading: false,
@@ -147,15 +159,17 @@
         },
         watch: {
             'queryData.query': function (newValue) {
-                this.showSpinner = true
-                if (this.hotWords.length && !newValue) {
-                    this.showHotWords = true
-                    this.searchMatch = null
-                    this.searchResult = null
-                } else {
-                    this.showHotWords = false
-                    this.searchResult = null
-                    !this.loading && this.getMatch()
+                if (!this.fetchingResult) {
+                    if (this.hotWords.length && !newValue) {
+                        this.showHotWords = true
+                        this.searchMatch.data = null
+                        this.searchResult = null
+                    } else if (typeof this.queryData.query === 'string') {
+                        const isWord = /^[\u4e00-\u9fa5a-zA-Z0-9]+$/.test(this.queryData.query.trim().replace(/\s/g, ''))
+                        if (isWord) {
+                            this.getMatch()
+                        }
+                    }
                 }
             }
         },
@@ -170,6 +184,10 @@
             }
         },
         created() {
+            if (this.$route.query.query) {
+                this.queryData.query = this.$route.query.query
+                this.refresh()
+            }
             this.getHotWords();
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
@@ -179,9 +197,12 @@
             })
         },
         beforeRouteEnter(to, from, next) {
-            document.title = to.meta.title
+            document.title = '应用搜索'
             next(vm => {
                 setTimeout(function () {
+                    if (!vm.queryData.query) {
+                        vm.$refs['searchInput'] && vm.$refs['searchInput'].focus()
+                    }
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
                 }, 250)
                 setTimeout(function () {
@@ -190,15 +211,21 @@
             })
         },
         beforeRouteLeave(to, from, next) {
-            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
-            if (position) {
-                this.scrollPosition = {x: 0, y: position.top, animate: false}
+            if (this.onLine) {
+                const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                if (position) {
+                    this.scrollPosition = {x: 0, y: position.top, animate: false}
+                }
+                this.showScrollerMask = true
+                if (to.name !== 'AppDetail') {
+                    setTimeout(() => {
+                        this.queryData.query = ''
+                    }, 500)
+                }
+                next()
+            } else {
+                this.$vux.toast.text('网络异常')
             }
-            this.showScrollerMask = true
-            if(to.name !== 'AppDetail') {
-                this.queryData.query = ''
-            }
-            next()
         },
         methods: {
             getHotWords() {
@@ -211,50 +238,69 @@
             },
             getMatch: debounce(function () {
                 this.loading = true
-                this.showSpinner = true
+                this.showMatch = true
+                this.showSpinner = false
+                !this.searchMatch.data && (this.showSpinner = true)
                 fetchSearchMatch(this.queryData).then(res => {
                     this.loading = false
                     if (res.code === '0') {
                         this.searchMatch = res
+                        this.showHotWords = false
+                        this.searchResult = null
                     }
-                    document.querySelector('.main').scrollTop = 0
+                    document.querySelector('.main') && (document.querySelector('.main').scrollTop = 0)
                 }, () => {
                     this.loading = false
                 })
             }, 500),
             getResult(done, refresh) {
-                if(this.inputEl) {
+                if (this.inputEl) {
                     this.inputEl.blur()
                 }
-                if(!this.onLine) {
-                    this.$vux.toast.text('网络断开了')
-                    return
-                }
-                this.loading = true;
+                this.loading = true
                 this.searchMatch.data = null
                 this.showHistorySearchWords = false
+                this.showHotWords = false
+                this.fetchingResult = true
                 this.queryData.query = this.queryData.query ? this.queryData.query : this.hotWord;
                 fetchSearchResult(this.queryData).then(res => {
                     if (typeof done === 'function') {
                         done()
                     }
                     this.loading = false
-                    if(refresh) {
+                    this.fetchingResult = false
+                    if (refresh) {
                         this.searchResult = null
                     }
                     if (res.code === '0') {
                         this.searchResult = res.data
+                        // 保存搜索历史
+                        if(res.data && res.data.apps.length) {
+                            this.setCacheHistory(this.queryData.query);
+                        }
                     }
-                    // 保存搜索历史
-                    this.setCacheHistory(this.queryData.query);
                 }, () => {
                     this.loading = false
+                    this.fetchingResult = false
+                    if (typeof done === 'function') {
+                        done(true)
+                    }
+                    this.$vux.toast.text('加载超时', 'bottom')
                 })
             },
             handleHotWordClick(data) {
-                this.queryData.query = data;
-                this.showHotWords = false
-                this.showHistorySearchWords = false
+                if (data.ikey === 'app') {
+                    this.$router.push({
+                        name: 'AppDetail',
+                        append: false,
+                        params: {appId: data.ivalue},
+                        query: {isSub: true}
+                    })
+                } else {
+                    this.queryData.query = data.searchWord;
+                    this.showHotWords = false
+                    this.showHistorySearchWords = false
+                }
             },
             setCacheHistory(word) {
                 if (word && word.trim()) {
@@ -265,7 +311,7 @@
                         return
                     }
                     this.historySearchWords.unshift(word)
-                    if(this.historySearchWords.length > 8) {
+                    if (this.historySearchWords.length > 8) {
                         this.historySearchWords.length = 8
                     }
                     const words = JSON.stringify(this.historySearchWords)
@@ -282,12 +328,26 @@
                 this.historySearchWords = []
                 window.localStorage.removeItem('historySearchWordsFromAppStore')
             },
-            refresh(done) {
-                this.showSpinner = false
+            refresh(done, showSpinner = false) {
+                if (!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if (typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
+                this.showSpinner = showSpinner
                 this.queryData.pageIndex = 1
                 this.getResult(done, true)
             },
             getMore(done) {
+                if (!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if (typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
                 this.queryData.pageIndex++
                 this.loading = true;
                 this.showSpinner = false;
@@ -312,13 +372,30 @@
                         done(true)
                     }
                     //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
+                    this.queryData.pageIndex--
                     this.loading = false
                     this.showSpinner = true;
+                    this.$vux.toast.text('获取数据失败')
                 })
 
             },
             goToDetail(app) {
-                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id}, query: {isSub: true}})
+                this.$router.push({
+                    name: 'AppDetail',
+                    append: false,
+                    params: {appId: app.id, appName: app.name},
+                    query: {isSub: true}
+                })
+            },
+            handleSearch() {
+                this.showMatch = false
+                this.$router.replace({
+                    name: 'AppStoreSearch',
+                    append: false,
+                    params: {hotWord: this.hotWord},
+                    query: {query: this.queryData.query}
+                })
+                this.refresh(null, true)
             }
         },
         components: {
@@ -385,11 +462,12 @@
         .search-input {
             display: block;
             height: 100%;
-            width: 100%;
+            width: 85%;
             font-size: 15px;
             border: none;
             box-sizing: border-box;
             padding-left: 15px;
+            -webkit-appearance: none;
             &:focus {
                 outline: none;
             }
@@ -399,7 +477,7 @@
             flex: 1;
             position: relative;
             overflow: auto;
-            transform: translate3d(0,0,0);
+            transform: translate3d(0, 0, 0);
             -webkit-overflow-scrolling: touch;
         }
         //---

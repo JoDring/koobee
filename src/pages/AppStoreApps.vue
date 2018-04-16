@@ -1,7 +1,7 @@
 <template>
     <div class="app-store-apps">
         <x-header :left-options="{backText:''}">
-            {{title ? title : myTitle}}
+            {{myTitle}}
             <router-link :to="{name: 'AppStoreSearch', append: false, params: {hotWord: hotword}}" slot="right">
                 <x-icon type="ios-search" size="23" style="fill: #666"></x-icon>
             </router-link>
@@ -45,11 +45,13 @@
                  position: absolute; z-index: 999;
                  top: 0;left: 0; display: flex;
                   justify-content: center; align-items: center">
-                <spinner type="android"></spinner>
+                <spinner type="android">
+                </spinner>
             </div>
         </main>
         <refresh-tip v-if="!loading && failLoaded && apps.length === 0"
-                     @click.native="refresh(null, true)"></refresh-tip>
+                     @click.native="refresh(null, true)">
+        </refresh-tip>
     </div>
 </template>
 
@@ -91,7 +93,8 @@
                 type: String
             },
             title: {
-                type: String
+                type: String,
+                default: '应用分类'
             }
         },
         computed: {
@@ -119,9 +122,6 @@
             'type': function () {
                 this.apps = []
                 !this.loading && this.refresh(null, true)
-            },
-            'myTitle': function () {
-                document.title = this.title ? this.title : this.myTitle;
             }
         },
         beforeRouteEnter(to, from, next) {
@@ -135,12 +135,16 @@
             })
         },
         beforeRouteLeave(to, from, next) {
-            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
-            if (position) {
-                this.scrollPosition = {x: 0, y: position.top, animate: false}
+            if (this.onLine) {
+                const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                if (position) {
+                    this.scrollPosition = {x: 0, y: position.top, animate: false}
+                }
+                this.showScrollerMask = true
+                next()
+            } else {
+                this.$vux.toast.text('网络异常')
             }
-            this.showScrollerMask = true
-            next()
         },
         created() {
             this.showSpinner = true
@@ -167,6 +171,7 @@
                         break;
                     default:
                         this.getCategoryList(done, refresh)
+                        break;
                 }
             },
             getHotWords() {
@@ -224,6 +229,7 @@
                 }
                 if (res.data && res.data.apps && res.data.apps.length) {
                     this.apps = [...this.apps, ...res.data.apps]
+                    document.title = this.myTitle
                 } else {
                     if (typeof done === 'function') {
                         done(true)
@@ -237,20 +243,37 @@
                 if (typeof done === 'function') {
                     done(true)
                 }
-                this.$vux.toast.text('加载超时', 'bottom')
+                if (this.queryData.pageIndex > 1) {
+                    this.queryData.pageIndex--
+                }
+                this.$vux.toast.text('获取数据失败', 'bottom')
             },
             refresh(done, showSpinner = false) {
+                if (!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if (typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
                 this.showSpinner = showSpinner
                 this.queryData.pageIndex = 1
                 this.getApps(done, true)
             },
             getMore(done) {
+                if (!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if (typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
                 this.showSpinner = false
                 this.queryData.pageIndex++
                 !this.loading && this.getApps(done)
             },
             goToDetail(app) {
-                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id}, query: {isSub: true}})
+                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id, appName: app.name}, query: {isSub: true}})
             }
 
         },
@@ -296,9 +319,6 @@
         .list-detail {
             .list-item {
                 position: relative;
-                &:active {
-                    background-color: #eee;
-                }
             }
             .list-item-c {
                 height: 94px;
@@ -307,6 +327,9 @@
                 box-sizing: border-box;
                 background: #fff;
                 padding: 0 20px;
+                &:active {
+                    background-color: #eee;
+                }
             }
             .list-item-icon-c {
                 width: 65px;

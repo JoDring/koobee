@@ -6,7 +6,7 @@
           content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" href="./static/favicon.ico">
-    <title>努力加载中...</title>
+    <title></title>
     <style type="text/css">
         .elm-spinner {
             height: 300px;
@@ -21,6 +21,7 @@
             -ms-flex-pack: center;
             justify-content: center;
         }
+
         .elm-spinner:after {
             display: block;
             content: '';
@@ -38,6 +39,7 @@
             border-top: .053333rem solid #2395ff;
             border-radius: 100%;
         }
+
         @-webkit-keyframes spinner {
             from {
                 -webkit-transform: rotate(0);
@@ -49,6 +51,7 @@
                 transform: rotate(360deg)
             }
         }
+
         @keyframes spinner {
             from {
                 -webkit-transform: rotate(0);
@@ -60,11 +63,39 @@
                 transform: rotate(360deg)
             }
         }
+
+        /*刷新*/
+        .index-offline-tip {
+            text-align: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            width: 100%;
+            height: 100px;
+        }
+        .index-offline-tip-btn {
+            margin-top: 20px;
+            background: #1ca1ff;
+            border: none;
+            width: 90px;
+            height: 30px;
+            border-radius: 30px;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
 <div id="app">
-    <div class="elm-spinner"></div>
+    <div class="elm-spinner" id="index-spinner"></div>
+    <div class="index-offline-tip" id="index-offline-tip" style="display: none">
+        <div>网络断开了</div>
+        <button class="index-offline-tip-btn" onclick="location.reload()">刷新</button>
+    </div>
 </div>
 <%=htmlWebpackPlugin.files.webpackManifest%>
 <script>
@@ -83,17 +114,16 @@
         let s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(mta, s);
     })();
-    //隐藏服务器恶意广告
-    setTimeout(function () {
-        let adDiv1 = document.querySelector('[id^="chunasqwd"]')
-        if (adDiv1) {
-            adDiv1.style.display = 'none'
-        }
-        let adDiv2 = document.querySelector('[id^="_embed"]')
-        if (adDiv2) {
-            adDiv2.style.display = 'none'
-        }
-    }, 250)
+
+    //断网提示
+    const indexSpinner = document.getElementById('index-spinner');
+    const indexOfflineTip = document.getElementById('index-offline-tip');
+    if(indexSpinner && indexSpinner) {
+        window.addEventListener('offline', () => {
+            indexSpinner.style.display = 'none'
+            indexOfflineTip.style.display = 'block'
+        })
+    }
 </script>
 </body>
 </html>

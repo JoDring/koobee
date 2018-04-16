@@ -2,15 +2,17 @@ import Router from 'vue-router';
 
 const NotFound = () => import('../components/NotFound.vue');
 const H5Games = () => import('../components/H5Games.vue');
-const AppDetail = () => import('../pages/AppDetail.vue');
-const AppStoreHome = () => import('../pages/AppStoreHome.vue');
-const AppStoreSearch = () => import('../pages/AppStoreSearch.vue');
-const AppStoreCategory = () => import('../pages/AppStoreCategory.vue');
-const AppStoreApps = () => import('../pages/AppStoreApps.vue');
-const InformationList = () => import('../pages/InformationList.vue');
-const InformationDetail = () => import('../pages/InformationDetail.vue');
-import Lottery from '../components/Lottery.vue'
 
+const AppStoreHome = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreHome.vue');
+const AppDetail = () => import(/* webpackChunkName: "appStore" */ '../pages/AppDetail.vue');
+const AppStoreSearch = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreSearch.vue');
+const AppStoreCategory = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreCategory.vue');
+const AppStoreApps = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreApps.vue');
+
+const InformationList = () => import(/* webpackChunkName: "information" */ '../pages/InformationList.vue');
+const InformationDetail = () => import(/* webpackChunkName: "information" */ '../pages/InformationDetail.vue');
+
+const Lottery = () => import('../components/Lottery.vue')
 const LotteryYuandan2017 = () => import('../components/Lottery-yuandan2017.vue');
 const LotteryChunjie2018 = () => import('../components/Lottery-chunjie2018.vue');
 
@@ -97,6 +99,7 @@ export default new Router({
         },
         {
             path: '/*',
+            name: 'NotFound',
             component: NotFound
         },
     ]

@@ -20,6 +20,20 @@
                 this.$vux.toast.text('网络已断开')
                 this.$vux.bus.$emit('off-line')
             })
+
+        },
+        mounted() {
+            //隐藏服务器恶意广告
+            this.$nextTick(function () {
+                let adDiv1 = document.querySelector('[id^="chunasqwd"]')
+                if (adDiv1) {
+                    adDiv1.style.display = 'none'
+                }
+                let adDiv2 = document.querySelector('[id^="_embed"]')
+                if (adDiv2) {
+                    adDiv2.style.display = 'none'
+                }
+            })
         }
     }
 </script>
@@ -31,16 +45,16 @@
     html, body {
         height: 100%;
     }
-
+    input::-webkit-search-cancel-button{
+        display: none;
+    }
     body {
         overflow: hidden;
         font-size: 16px;
     }
-
     .weui-mask {
         touch-action: none;
     }
-
     #app {
         height: 100%;
         background: #fff;

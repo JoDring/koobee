@@ -3,13 +3,6 @@
         <!--<x-header :left-options="{backText:''}">
             {{pageTitle}}
         </x-header>-->
-        <div class="information-regions" v-show="regions && regions.length">
-            <div @click="goToPackageList(item)" class="regions-item" v-for="item in regions" :key="item.id">
-                <img class="regions-item-img" v-lazy="item.imageUrl">
-                <div>{{item.title}}</div>
-                <div class="regions-item-btn">进入</div>
-            </div>
-        </div>
         <div class="list">
             <transition name="vux-fade">
                 <div class="my-scroller-mask"
@@ -28,6 +21,13 @@
                     ref="scroller"
                     :on-refresh="refresh"
                     :on-infinite="getMore">
+                <div class="information-regions" v-show="regions && regions.length">
+                    <div @click="goToPackageList(item)" class="regions-item" v-for="item in regions" :key="item.id">
+                        <img class="regions-item-img" v-lazy="item.imageUrl">
+                        <div>{{item.title}}</div>
+                        <div class="regions-item-btn">进入</div>
+                    </div>
+                </div>
                 <div class="list-item" v-for="item in list" :key="item.id">
                     <div class="list-item-c" @click="goToDetail(item)">
                         <div v-lazy:background-image="{src: item.imageUrl, loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"
@@ -111,16 +111,16 @@
         },
         computed: {
             pageTitle() {
-                return this.app ? this.app.name : this.title
+                return this.title ? this.title : this.app.name
             }
         },
         created() {
+            document.title = this.title
             // 第三方来源需要添加的头
             const metaNode = document.createElement('meta')
             metaNode.name = 'referrer'
             metaNode.content = 'never'
             document.head.appendChild(metaNode)
-            document.title = this.title
             this.getInformationList()
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
@@ -140,6 +140,7 @@
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
+                document.title = vm.title
                 setTimeout(function () {
                     if (vm.resetScroller) {
                         vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, 0, true);
@@ -169,6 +170,7 @@
                 }
                 this.loading = false
                 this.showScrollerMask = false
+                document.title = this.title
                 if (res.data) {
                     if (this.queryData.pageIndex === 1) {
                         if (res.data.regions) {
@@ -231,6 +233,7 @@
             goToPackageList(item) {
                 this.$router.push({
                     name: 'InformationList',
+                    params:{title: item.title},
                     query: {packageName: item.packageName}
                 })
             }

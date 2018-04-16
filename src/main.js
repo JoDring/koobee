@@ -24,9 +24,13 @@ Vue.use(ConfirmPlugin);
 Vue.use(AlertPlugin);
 Vue.use(BusPlugin);
 Vue.use(AjaxPlugin);
-const FastClick = require('fastclick')
-FastClick.attach(document.body)
+/*const FastClick = require('fastclick')
+FastClick.attach(document.body)*/
 Vue.config.productionTip = false;
+/*router.beforeEach((to, from, next) => {
+    //document.title = '努力加载中...'
+    next()
+})*/
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

@@ -9,20 +9,23 @@
                 <section class="section-brief">
                     <div class="blur-img-c">
                         <x-img container=".view-body" class="blur-img"
-                               default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
-                               height="180"></x-img>
+                               default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
+                               height="180">
+                        </x-img>
                         <div class="mask-color"></div>
                         <img class="mask-img" src="static/images/bg-mask.png" width="720" height="122">
                     </div>
                     <div class="logo-c">
                         <x-img container=".view-body" class="logo-big"
-                               default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl" width="180"
-                               height="180"></x-img>
+                               default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
+                               height="180">
+                        </x-img>
                         <div class="inverted-logo-c">
                             <x-img container=".view-body" class="logo-big inverted"
-                                   default-src="static/images/palceholder-logo.png" :src="appList[0].iconUrl"
+                                   default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl"
                                    width="180"
-                                   height="180"></x-img>
+                                   height="180">
+                            </x-img>
                         </div>
                         <div class="inverted-mask"></div>
                     </div>
@@ -33,7 +36,8 @@
                         </p>
                     </div>
                     <div class="app-down-btn">
-                        <btn-download :url="appList[0].downloadUrl"></btn-download>
+                        <btn-download :url="appList[0].downloadUrl">
+                        </btn-download>
                     </div>
 
                 </section>
@@ -59,14 +63,15 @@
                 <section class="app-ad" v-if="sameCatApps.length > 0">
                     <h2>相关推荐</h2>
                     <div class="app-ad-list">
-                        <flexbox :gutter="0">
-                            <flexbox-item :span="3" class="ad-list-item" v-for="item in sameCatApps" :key="item.id">
+                        <div class="flexbox">
+                            <div class="flexbox-item ad-list-item" v-for="item in sameCatApps" :key="item.id">
                                 <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
                                         <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
-                                               height="130" v-if="onLine"></x-img>
+                                               height="130" v-if="onLine">
+                                        </x-img>
                                         <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
                                     </div>
                                 </router-link>
@@ -74,23 +79,25 @@
                                 <p>{{item.downloadTimes | timesFormat}}人使用</p>
                                 <div class="btn-c">
                                     <btn-download :url="item.downloadUrl"
-                                                  :mini="true"></btn-download>
+                                                  :mini="true">
+                                    </btn-download>
                                 </div>
-                            </flexbox-item>
-                        </flexbox>
+                            </div>
+                        </div>
                     </div>
                 </section>
                 <section class="app-ad" v-if="sameDevApps.length > 0">
                     <h2>大家也喜欢</h2>
                     <div class="app-ad-list">
-                        <flexbox :gutter="0">
-                            <flexbox-item :span="3" class="ad-list-item" v-for="item in sameDevApps" :key="item.id">
+                        <div class="flexbox" :gutter="0">
+                            <div class="flexbox-item ad-list-item" v-for="item in sameDevApps" :key="item.id">
                                 <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
                                         <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
-                                               height="130" v-if="onLine"></x-img>
+                                               height="130" v-if="onLine">
+                                        </x-img>
                                         <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
                                     </div>
                                 </router-link>
@@ -98,10 +105,11 @@
                                 <p>{{item.downloadTimes | timesFormat}}人使用</p>
                                 <div class="btn-c">
                                     <btn-download :url="item.downloadUrl"
-                                                  :mini="true"></btn-download>
+                                                  :mini="true">
+                                    </btn-download>
                                 </div>
-                            </flexbox-item>
-                        </flexbox>
+                            </div>
+                        </div>
                     </div>
                 </section>
                 <section class="app-other">
@@ -110,13 +118,17 @@
                 </section>
             </div>
         </template>
+        <!--loading spinner-->
+        <div v-if="loading"
+             style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+            <spinner type="android"></spinner>
+        </div>
     </div>
 </template>
-
 <script>
     import BtnDownload from '../components/btn-download.vue';
-    import {Flexbox, FlexboxItem, ViewBox, XHeader, XImg} from 'vux';
-    import assign from 'lodash/assign';
+    import {XHeader, XImg, Spinner} from 'vux';
+    //import assign from 'lodash/assign';
 
     const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/appinfo/details?appId=' : 'http://192.168.1.148:8090/appstore/appinfo/details?appId=';
     export default {
@@ -124,12 +136,17 @@
         props: {
             appId: {
                 require: true
+            },
+            appName: {
+                type: String,
+                default: '应用详情'
             }
         },
         data() {
             return {
                 msg: '',
                 showMore: false,
+                loading: false,
                 appList: [], //第一个是 需要详情的App
                 onLine: window.navigator.onLine
             }
@@ -146,32 +163,43 @@
             }
         },
         created() {
-            this.fetchData();
-            window.setState = function setState(id, state) { //给app调用改变组件按钮状态的接口函数
+            // 第三方来源需要添加的头
+            /*const metaNode = document.createElement('meta')
+            metaNode.name = 'referrer'
+            metaNode.content = 'never'
+            document.head.appendChild(metaNode)*/
+            /*window.setState = function setState(id, state) { //给app调用改变组件按钮状态的接口函数
                 let newAppList = this.appList.map(value => {
                     if (value.id == id) {
-                        value.btnState = assign({}, value.btnState, state)
+                        value.btnState = Object.assign({}, value.btnState, state)
                     }
                     return value;
                 });
                 this.appList = [...newAppList];
-            }.bind(this);
+            }.bind(this);*/
+            document.title = this.appName
+            this.fetchData();
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
             })
             this.$vux.bus.$on('on-line', () => {
                 this.onLine = true
             })
-            // document.title = '应用详情';
+            window.addEventListener('popstate', (e) => {
+                console.log(this.$vux.alert)
+                this.loading = false;
+                this.$vux.confirm.hide();
+                this.$vux.alert.hide();
+            })
         },
         watch: {
             '$route': 'fetchData'
         },
         methods: {
             fetchData() {
-                this.$vux.loading.show();
+                this.loading = true
                 this.$http.get(url.concat(this.appId)).then(res => {
-                    this.$vux.loading.hide();
+                    this.loading = false
                     if (res.data.code === '0' || res.data.code === 0) {
                         let data = res.data.data;
                         this.appList = [data.app];
@@ -184,7 +212,6 @@
                         if (this.appList.length > 0) {
                             const scrollContainer = document.querySelector('.view-body')
                             scrollContainer && (scrollContainer.scrollTop = 0);
-                            document.title = this.appList[0].name || '应用详情';
                         }
                         /*
                         * 绑定按钮状态响应的data
@@ -194,7 +221,7 @@
                         * demo: setState('435', {startLoad:true, pause: false,  percentage: 20})
                         * */
                         this.appList = this.appList.map(value => {
-                            return assign(value, {
+                            return Object.assign(value, {
                                 btnState: {
                                     percentage: 0,
                                     startLoad: false,
@@ -204,16 +231,16 @@
                         })
 
                     } else {
-                        this.$vux.alert.show({
+                        this.$vux.confirm.show({
                             title: '错误提示',
-                            content: res.data.msg,
-                            onHide: () => {
-                                this.$router ? this.$router.go(-1) : window.history.go(-1);
-                            },
+                            content: res.data.msg + ', 返回上一页?',
+                            onConfirm: () => {
+                                this.$router ? this.$router.back() : window.history.back();
+                            }
                         });
                     }
                 }, res => {
-                    this.$vux.loading.hide();
+                    this.loading = false
                     this.$vux.confirm.show({
                         title: '错误提示',
                         content: '获取失败了',
@@ -226,37 +253,11 @@
         },
         components: {
             BtnDownload,
-            Flexbox,
-            FlexboxItem,
-            ViewBox,
             XHeader,
-            XImg
+            XImg,
+            Spinner
         },
         filters: {
-            sizeFormat(val) {
-                let fm = '';
-                let u = 0;
-                while (u < 4 && val > 1024) {
-                    u++;
-                    val /= 1024;
-                }
-                let unit = 'Byte';
-                switch (u) {
-                    case 1:
-                        unit = 'KB';
-                        break;
-                    case 2:
-                        unit = 'MB';
-                        break;
-                    case 3:
-                        unit = 'GB';
-                        break;
-                    case 4:
-                        unit = 'TB';
-                }
-                fm += val.toFixed(2) + unit;
-                return fm;
-            },
             timesFormat(val) {
                 let fm = '';
                 let u = 0;
@@ -279,7 +280,7 @@
         },
     }
 </script>
-<style lang="less">
+<style lang="less" scoped>
     @import "../../node_modules/vux/src/styles/weui/base/fn.less";
 
     h1 {
@@ -290,6 +291,16 @@
     h2 {
         font-size: 28px/@ratio;
         font-weight: normal;
+    }
+    .flexbox {
+        display: flex;
+        width: 100%;
+
+    }
+    .flexbox-item{
+        flex: 0 0 25%;
+        min-width: 20px;
+        width: 0;
     }
 
     .view-container {

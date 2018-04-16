@@ -1,7 +1,8 @@
 <template>
-    <a @click="handleClick($event, url)" download="app.apk" :href="url" class="weui-btn"
+    <a @click="handleClick($event, url)" download="app.apk" :href="url"
+       class="weui-btn"
        :class="[String(percentage) == '0.0' || (percentage > 0 && percentage < 100) ? 'weui-btn_plain-primary' : 'weui-btn_primary',
-              mini ? 'weui-btn_small' : '']">
+              mini ? 'weui-btn_small' : '', $route.query.from==='gamecenter' ? 'orange': '']">
         <div class="process-bg" :style="{width: percentage + '%'}">
             <div class="process-bg-img"></div>
         </div>
@@ -46,7 +47,12 @@
                     return
                 }
                 if(!window.jsObj) {
-                    window.open(url);
+                    if(window.navigator.onLine) {
+                        //window.open(url);
+                        location.href = url
+                    } else {
+                        alert('网络异常')
+                    }
                 } else {
                     this.$emit('click')
                 }

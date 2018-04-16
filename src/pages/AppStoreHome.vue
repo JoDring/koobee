@@ -56,18 +56,25 @@
                 <div class="footer-title">应用市场</div>
                 <div class="footer-brief">8.62M</div>
             </div>
-            <btn-download class="btn-download btn-footer" url="http://appstore.szprize.cn/appstore/api/getapp" btnText="安装"
-                          style="background: #ff6c3a;"></btn-download>
+            <btn-download class="btn-download btn-footer"
+                          url="http://appstore.szprize.cn/appstore/api/getapp" btnText="安装"
+                          style="background: #ff6c3a;">
+            </btn-download>
             <div class="icon-close-c" @click="showFooter = false">
                 <x-icon class="icon-close" type="ios-close-empty" size="22"></x-icon>
             </div>
         </div>
         <refresh-tip v-if="!loading && failLoaded && apps.length === 0" @click.native="getHomeData"></refresh-tip>
+        <!--loading spinner-->
+        <div v-if="loading && showSpinner"
+             style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+            <spinner type="android"></spinner>
+        </div>
     </div>
 </template>
 
 <script>
-    import {Grid, GridItem, Marquee, MarqueeItem} from 'vux'
+    import {Grid, GridItem, Marquee, MarqueeItem, Spinner} from 'vux'
     import {formatSize} from '../filters'
     import {fetchHome, fetchSearchHotWords} from '../services/appStore'
     import BtnDownload from '../components/btn-download'
@@ -86,6 +93,7 @@
                 hotWords: [],
                 showFooter: true,
                 loading: false,
+                showSpinner: true,
                 categoryMap: {
                     need: {name: 'AppStoreApps', append: false, params: {type: 'need', title: '装机必备'}},
                     rank: {name: 'AppStoreApps', append: false, params: {type: 'rank', title: '下载榜单'}},
@@ -100,7 +108,19 @@
             }
         },
         created() {
-            this.getHomeData().then(this.getHotWords)
+            this.getHomeData().then(() => {
+                this.getHotWords()
+                /*this.$vux.confirm.show({
+                    content: '是否需要打开 应用市场app',
+                    maskTransition:'none',
+                    onConfirm: function () {
+                        const ifr = document.createElement('iframe');
+                        ifr.src = 'weixin://';
+                        ifr.style.display = 'none';
+                        document.body.appendChild(ifr)
+                    }
+                })*/
+            })
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
             })
@@ -109,7 +129,7 @@
             })
         },
         beforeRouteEnter(to, from, next) {
-            document.title = to.meta.title
+            document.title = '应用市场'
             next(vm => {
                 setTimeout(function () {
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
@@ -120,19 +140,39 @@
             })
         },
         beforeRouteLeave(to, from, next) {
-            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
-            if (position) {
-                this.scrollPosition = {x: 0, y: position.top, animate: false}
+            if(this.onLine) {
+                const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                if (position) {
+                    this.scrollPosition = {x: 0, y: position.top, animate: false}
+                }
+                this.showScrollerMask = true
+                next()
+            } else {
+                this.$vux.toast.text('网络异常')
             }
-            this.showScrollerMask = true
-            next()
         },
         methods: {
             refresh(done) {
+                this.showSpinner = false
+                if(!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if(typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
                 this.queryData.pageIndex = 1
                 !this.loading && this.getHomeData(done, true)
             },
             getMore(done) {
+                this.showSpinner = false
+                if(!this.onLine) {
+                    this.$vux.toast.text('网络断开了')
+                    if(typeof done === 'function') {
+                        done(true)
+                    }
+                    return
+                }
                 this.queryData.pageIndex++;
                 !this.loading && this.getHomeData(done)
             },
@@ -164,6 +204,9 @@
                     if (typeof done === 'function') {
                         done(true)
                     }
+                    if(this.queryData.pageIndex > 1) {
+                        this.queryData.pageIndex--
+                    }
                     this.$vux.toast.text('获取数据失败', 'bottom')
                 })
             },
@@ -182,7 +225,7 @@
                 this.$router.push({name: 'AppStoreSearch', append: false, params: {hotWord: searchWord || '游戏'}})
             },
             goToDetail(app) {
-                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id}, query: {isSub: true}})
+                this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id, appName: app.name}, query: {isSub: true}})
             }
         },
         components: {
@@ -190,7 +233,8 @@
             GridItem,
             BtnDownload,
             Marquee, MarqueeItem,
-            RefreshTip
+            RefreshTip,
+            Spinner
         },
         filters: {
             formatSize
@@ -267,19 +311,18 @@
         }
         .list-item {
             position: relative;
+
+        }
+        .list-item-c {
+            width: 100%;
             height: 94px;
+            padding: 0 13px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             &:active {
                 background: #eee;
             }
-        }
-        .list-item-c {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 0 13px;
-            box-sizing: border-box;
         }
         .list-item-icon-c {
             width: 65px;
