@@ -1,5 +1,8 @@
 <template>
     <div class="app-store-home">
+        <div style="display: none">
+            <img class="logo" src="src/assets/appStore/logo.png">
+        </div>
         <div slot="header" class="header"  @click="goToSearchPage">
             <div class="search-home">
                 <div class="search-home-content">
@@ -46,9 +49,14 @@
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
                     </div>
-                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
+                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="安装"></btn-download>
                 </div>
             </scroller>
+            <scroll-to-top v-if="$refs['scroller']"
+                           :scrollTop="scrollPosition.y"
+                           @click.native="scrollPosition.y = 0"
+                           :scroller="$refs['scroller']">
+            </scroll-to-top>
         </div>
         <div slot="bottom" class="footer" v-show="showFooter">
             <img class="footer-app-icon" src="../assets/appStore/app-store-icon.png">
@@ -79,7 +87,7 @@
     import {fetchHome, fetchSearchHotWords} from '../services/appStore'
     import BtnDownload from '../components/btn-download'
     import RefreshTip from '../components/RefreshTip'
-
+    import ScrollToTop from '../components/ScrollToTop'
     export default {
         name: "app-store-home",
         data() {
@@ -192,6 +200,10 @@
                         }
                         if (res.data.apps && res.data.apps.length) {
                             this.apps = [...this.apps, ...res.data.apps]
+                            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                            if (position) {
+                                this.scrollPosition = {x: 0, y: position.top, animate: false}
+                            }
                         } else {
                             if (typeof done === 'function') {
                                 done(true)
@@ -234,7 +246,8 @@
             BtnDownload,
             Marquee, MarqueeItem,
             RefreshTip,
-            Spinner
+            Spinner,
+            ScrollToTop
         },
         filters: {
             formatSize
@@ -255,6 +268,7 @@
         color: @black;
         display: flex;
         flex-direction: column;
+        -webkit-touch-callout: none;
         .header {
             background: #fff;
             flex-shrink: 0;

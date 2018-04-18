@@ -37,9 +37,14 @@
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
                     </div>
-                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
+                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="安装"></btn-download>
                 </div>
             </scroller>
+            <scroll-to-top v-if="$refs['scroller']"
+                           :scrollTop="scrollPosition.y"
+                           @click.native="scrollPosition.y = 0"
+                           :scroller="$refs['scroller']">
+            </scroll-to-top>
             <div v-if="loading && showSpinner"
                  style="width: 100%; height: 100%;
                  position: absolute; z-index: 999;
@@ -62,7 +67,7 @@
     import {formatSize} from '../filters'
     import sample from 'lodash/sample'
     import {fetchSearchHotWords, fetchCategoryList, fetchGame, fetchNeed, fetchRank} from '../services/appStore'
-
+    import ScrollToTop from '../components/ScrollToTop'
     export default {
         name: "app-store-apps",
         data() {
@@ -126,13 +131,15 @@
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
-                setTimeout(function () {
+                document.title = '应用分类'
+                    setTimeout(function () {
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
                 }, 250)
                 setTimeout(function () {
                     vm.showScrollerMask = false
                 }, 500)
             })
+
         },
         beforeRouteLeave(to, from, next) {
             if (this.onLine) {
@@ -229,7 +236,10 @@
                 }
                 if (res.data && res.data.apps && res.data.apps.length) {
                     this.apps = [...this.apps, ...res.data.apps]
-                    document.title = this.myTitle
+                    const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                    if (position) {
+                        this.scrollPosition = {x: 0, y: position.top, animate: false}
+                    }
                 } else {
                     if (typeof done === 'function') {
                         done(true)
@@ -281,7 +291,8 @@
             XHeader,
             BtnDownload,
             RefreshTip,
-            Spinner
+            Spinner,
+            ScrollToTop
         },
         filters: {
             formatSize
@@ -302,6 +313,7 @@
         color: #222;
         display: flex;
         flex-direction: column;
+        -webkit-touch-callout: none;
         .vux-header {
             flex-shrink: 0;
             position: relative;

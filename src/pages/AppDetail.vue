@@ -2,14 +2,14 @@
     <div class="view-container">
         <template v-if="appList.length > 0">
             <x-header class="view-header" v-if="$route.query.isSub" slot="header" :left-options="{backText: ''}">
-                {{appList.length &&
-                appList[0].name}}
+                {{appList.length && appList[0].name}}
             </x-header>
             <div class="view-body">
                 <section class="section-brief">
                     <div class="blur-img-c">
                         <x-img container=".view-body" class="blur-img"
-                               default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
+                               default-src="static/images/palceholder-logo.png"
+                               :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
                         <div class="mask-color"></div>
@@ -17,12 +17,14 @@
                     </div>
                     <div class="logo-c">
                         <x-img container=".view-body" class="logo-big"
-                               default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
+                               default-src="static/images/palceholder-logo.png"
+                               :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
                         <div class="inverted-logo-c">
                             <x-img container=".view-body" class="logo-big inverted"
-                                   default-src="static/images/palceholder-logo.png" :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl"
+                                   default-src="static/images/palceholder-logo.png"
+                                   :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl"
                                    width="180"
                                    height="180">
                             </x-img>
@@ -42,11 +44,15 @@
 
                 </section>
                 <section class="app-images">
-                    <img v-for="item in imgList"
-                         class="app-images-item"
-                         v-lazy="{src: item, loading: 'static/images/placeholder-appbg.png'}"
-                         :key="item"
-                         v-if="onLine">
+                    <x-img v-for="item in imgList"
+                           class="app-images-item"
+                           default-src="static/images/placeholder-appbg.png"
+                           container=".app-images"
+                           :src="item"
+                           :key="item"
+                           v-if="onLine">
+                    </x-img>
+                    <img class="app-images-item" src="static/images/placeholder-appbg.png" v-else>
                 </section>
                 <section class="app-desc-detail">
                     <h2>【应用介绍】</h2>
@@ -65,7 +71,7 @@
                     <div class="app-ad-list">
                         <div class="flexbox">
                             <div class="flexbox-item ad-list-item" v-for="item in sameCatApps" :key="item.id">
-                                <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
+                                <router-link :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
                                         <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
@@ -91,7 +97,7 @@
                     <div class="app-ad-list">
                         <div class="flexbox" :gutter="0">
                             <div class="flexbox-item ad-list-item" v-for="item in sameDevApps" :key="item.id">
-                                <router-link :to="{name:'AppDetail', params: {appId: item.id}, query: {isSub: true}}">
+                                <router-link :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
                                         <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
@@ -120,16 +126,34 @@
         </template>
         <!--loading spinner-->
         <div v-if="loading"
-             style="width: 100%; height: 100%; position: absolute; z-index: 999; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
+             style="width: 100%; height: 100%; position: absolute; z-index: 99; top: 0;left: 0; display: flex; justify-content: center; align-items: center">
             <spinner type="android"></spinner>
         </div>
+        <router-link :to="{name: 'AppStoreHome', append: false}"
+                     style="
+                     position: fixed;
+                     z-index: 999;
+                     right: 20px;
+                     background: #fff;
+                     border-radius: 50%;
+                     width: 44px;
+                     height: 44px;
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     box-shadow: 1px 1px 1px #ccc;
+                      bottom: 60px;">
+            <x-icon type="ios-home" size="30" style="fill:#009def;"></x-icon>
+        </router-link>
+        <refresh-tip v-if="!loading && failLoaded && appList.length === 0"
+                     @click.native="refresh(null, true)">
+        </refresh-tip>
     </div>
 </template>
 <script>
     import BtnDownload from '../components/btn-download.vue';
     import {XHeader, XImg, Spinner} from 'vux';
-    //import assign from 'lodash/assign';
-
+    import RefreshTip from '../components/RefreshTip'
     const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/appinfo/details?appId=' : 'http://192.168.1.148:8090/appstore/appinfo/details?appId=';
     export default {
         name: 'AppDetail',
@@ -139,7 +163,7 @@
             },
             appName: {
                 type: String,
-                default: '应用详情'
+                default: ''
             }
         },
         data() {
@@ -147,6 +171,7 @@
                 msg: '',
                 showMore: false,
                 loading: false,
+                failLoaded: false,
                 appList: [], //第一个是 需要详情的App
                 onLine: window.navigator.onLine
             }
@@ -177,7 +202,7 @@
                 });
                 this.appList = [...newAppList];
             }.bind(this);*/
-            document.title = this.appName
+            document.title = this.appName + ' APP详情'
             this.fetchData();
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
@@ -186,14 +211,16 @@
                 this.onLine = true
             })
             window.addEventListener('popstate', (e) => {
-                console.log(this.$vux.alert)
                 this.loading = false;
                 this.$vux.confirm.hide();
                 this.$vux.alert.hide();
             })
         },
         watch: {
-            '$route': 'fetchData'
+            '$route': function () {
+                this.fetchData()
+                document.title = this.appName + ' App详情'
+            }
         },
         methods: {
             fetchData() {
@@ -211,7 +238,9 @@
                         }
                         if (this.appList.length > 0) {
                             const scrollContainer = document.querySelector('.view-body')
+                            const imgScrollContainer = document.querySelector('.app-images')
                             scrollContainer && (scrollContainer.scrollTop = 0);
+                            imgScrollContainer && (imgScrollContainer.scrollLeft = 0);
                         }
                         /*
                         * 绑定按钮状态响应的data
@@ -241,6 +270,7 @@
                     }
                 }, res => {
                     this.loading = false
+                    this.failLoaded = true
                     this.$vux.confirm.show({
                         title: '错误提示',
                         content: '获取失败了',
@@ -255,7 +285,8 @@
             BtnDownload,
             XHeader,
             XImg,
-            Spinner
+            Spinner,
+            RefreshTip
         },
         filters: {
             timesFormat(val) {
@@ -292,12 +323,14 @@
         font-size: 28px/@ratio;
         font-weight: normal;
     }
+
     .flexbox {
         display: flex;
         width: 100%;
 
     }
-    .flexbox-item{
+
+    .flexbox-item {
         flex: 0 0 25%;
         min-width: 20px;
         width: 0;
@@ -320,6 +353,7 @@
         flex: 1;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
+        -webkit-touch-callout: none;
     }
 
     //--基本信息
@@ -441,7 +475,7 @@
         overflow-y: hidden;
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
-        transform: translate3d(0,0,0);
+        transform: translate3d(0, 0, 0);
         .app-images-item {
             display: inline-block;
             font-size: 0;

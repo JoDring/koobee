@@ -94,9 +94,14 @@
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
                     </div>
-                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="下载"></btn-download>
+                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="安装"></btn-download>
                 </div>
             </scroller>
+            <scroll-to-top v-if="$refs['scroller']"
+                           :scrollTop="scrollPosition.y"
+                           @click.native="scrollPosition.y = 0"
+                           :scroller="$refs['scroller']">
+            </scroll-to-top>
             <div v-else-if="searchResult &&  !searchResult.apps.length">
                 <div style="color: #666; font-size: 15px; text-align: center; margin: 30px 0">未找到匹配应用</div>
             </div>
@@ -126,7 +131,7 @@
     import {formatSize} from '../filters'
     import BtnDownload from '../components/btn-download'
     import {fetchSearchHotWords, fetchSearchMatch, fetchSearchResult} from '../services/appStore'
-
+    import ScrollToTop from '../components/ScrollToTop'
     export default {
         name: "app-store-search",
         data() {
@@ -360,11 +365,14 @@
                     if (res.code === '0') {
                         if (res.data.apps && res.data.apps.length) {
                             this.searchResult.apps = [...this.searchResult.apps, ...res.data.apps]
+                            const position = this.$refs['scroller'] && this.$refs['scroller'].getPosition();
+                            if (position) {
+                                this.scrollPosition = {x: 0, y: position.top, animate: false}
+                            }
                         } else {
                             if (typeof done === 'function') {
                                 done(true)
                             }
-                            //this.$refs['scroller'] && this.$refs['scroller'].finishInfinite(true)
                         }
                     }
                 }, () => {
@@ -400,7 +408,8 @@
         },
         components: {
             BtnDownload,
-            Spinner
+            Spinner,
+            ScrollToTop
         },
         filters: {
             formatSize
