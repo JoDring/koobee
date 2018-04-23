@@ -4,15 +4,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Router from 'vue-router';
-import VueScroller from 'vue-scroller'
-Vue.use(VueScroller)
-import VueLazyload from 'vue-lazyload'
-Vue.use(VueLazyload, {
-    preLoad: 1.3,
-    error: 'static/appStore/palceholder-logo.webp',
-    loading: 'static/appStore/palceholder-logo.webp',
-    attempt: 1
-})
 import {LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';
 Vue.use(ConfigPlugin, {
     $layout: 'VIEW_BOX'
@@ -30,7 +21,6 @@ Vue.config.productionTip = false;
     //document.title = '努力加载中...'
     next()
 })*/
-//隐藏服务器恶意广告
 //隐藏服务器恶意广告
 var adDiv1 = document.querySelector('[id^="chunasqwd"]')
 if (adDiv1) {

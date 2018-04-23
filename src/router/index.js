@@ -1,77 +1,49 @@
 import Router from 'vue-router';
 
-const NotFound = () => import('../components/NotFound.vue');
-const H5Games = () => import('../components/H5Games.vue');
+import NotFound from  '../pages/NotFound.vue';
+import Lottery from '../pages/Lottery.vue';
+import LotteryYuandan2017 from '../pages/Lottery-yuandan2017.vue';
+const LotteryChunjie2018 = () => import('../pages/Lottery-chunjie2018.vue');
 
-const AppStoreHome = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreHome.vue');
-const AppDetail = () => import(/* webpackChunkName: "appStore" */ '../pages/AppDetail.vue');
-const AppStoreSearch = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreSearch.vue');
-const AppStoreCategory = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreCategory.vue');
-const AppStoreApps = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreApps.vue');
-
-const InformationList = () => import(/* webpackChunkName: "information" */ '../pages/InformationList.vue');
-const InformationDetail = () => import(/* webpackChunkName: "information" */ '../pages/InformationDetail.vue');
+import Wuyi2018 from '../pages/Lottery-wuyi2018.vue';
 
 export default new Router({
     routes: [
         {
-            path: '/AppStoreHome',
-            name: 'AppStoreHome',
-            component: AppStoreHome,
-            meta:{title: '应用市场'},
-            props: true
-        },
-        {
-            path: '/AppStoreSearch/:hotWord',
-            name: 'AppStoreSearch',
-            meta:{title: '应用搜索'},
-            component: AppStoreSearch,
-            props: true
-        },
-        {
-            path: '/AppStoreCategory',
-            name: 'AppStoreCategory',
-            meta:{title: '应用分类'},
-            component: AppStoreCategory
-        },
-        {
-            path: '/AppStoreApps/:type',
-            name: 'AppStoreApps',
-            meta:{title: '应用列表'},
-            component: AppStoreApps,
-            props: true
-        },
-        {
-            path: '/AppDetail/:appId',
-            name: 'AppDetail',
-            component: AppDetail,
-            meta:{title: '应用详情'},
-            props: true
-        },
-        {
-            path: '/InformationList',
-            name: 'InformationList',
-            component: InformationList,
-            meta:{title: '热门资讯'},
-            props: true
-        },
-        {
-            path: '/InformationDetail/:id',
-            name: 'InformationDetail',
-            component: InformationDetail,
-            meta:{title: '资讯详情'},
-            props: true
-        },
-        {
-            path: '/H5Games/:id',
-            name: 'H5Games',
-            component: H5Games,
-            props: true
+            path: '/Lottery/:id',
+            component: Lottery,
+            props: true,
+            children: [
+                {
+                    path: '',
+                    name: 'lotteryDefault',
+                    component: LotteryYuandan2017,
+                    props: true
+                },
+                {
+                    path: 'yuandan2017',
+                    name: 'LotteryYuandan2017',
+                    component: LotteryYuandan2017,
+                    props: true
+                },
+                {
+                    path: 'chunjie2018',
+                    name: 'LotteryChunjie2018',
+                    component: LotteryChunjie2018,
+                    props: true
+                },
+                {
+                    path: 'wuyi2018',
+                    name: 'Wuyi2018',
+                    component: Wuyi2018,
+                    props: true
+                }
+            ]
         },
         {
             path: '/*',
             name: 'NotFound',
             component: NotFound
-        },
+        }
     ]
 })

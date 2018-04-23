@@ -1,89 +1,28 @@
 import request from '../util/request'
-
-export function fetchHome(params) {
+// ---抽奖
+export function clearTestCache() {
     return request({
-        url:'appstore/html/api/home',
-        method: 'get',
-        params
-    })
-}
-export function fetchAppDetail(params) {
-    return request({
-        url:'appstore/appinfo/details',
-        method: 'get',
-        params
-    })
-}
-export function fetchNeed(params) {
-    return request({
-        url:'appstore/html/api/need',
-        method: 'get',
-        params
-    })
-}
-export function fetchGame(params) {
-    return request({
-        url:'appstore/html/api/game',
-        method: 'get',
-        params
-    })
-}
-export function fetchRank(params) {
-    return request({
-        url:'appstore/html/api/rank',
-        method: 'get',
-        params
-    })
-}
-// 分类
-export function fetchCategory(params) {
-    return request({
-        url:'appstore/html/api/category',
-        method: 'get',
-        params
-    })
-}
-export function fetchCategoryList(params) {
-    return request({
-        url:'appstore/html/api/category/list',
-        method: 'get',
-        params
-    })
-}
-// 搜索
-export function fetchSearchResult(data) {
-    return request({
-        url:'appstore/html/api/search/result',
-        method: 'post',
-        data
-    })
-}
-export function fetchSearchMatch(data) {
-    return request({
-        url:'appstore/html/api/search/match',
-        method: 'post',
-        data
-    })
-}
-export function fetchSearchHotWords() {
-    return request({
-        url:'appstore/html/api/search/hotwords',
+        url:'http://192.168.1.148:8090/appstore/record/clear',
         method: 'get'
     })
 }
-
-
-// ---资讯
-export function fetchInformationList(params) {
+export function fetchLotteryDetail(params) {
     return request({
-        url:'appstore/html/api/information/list',
+        url:'appstore/web/api/detail',
         method: 'get',
         params
     })
 }
-export function fetchInformationDetail(params) {
+export function fetchLotteryMyAwards(params) {
     return request({
-        url:'appstore/html/api/information/detail',
+        url:'appstore/web/api/myawards',
+        method: 'get',
+        params
+    })
+}
+export function fetchLotteryRecords(params) {
+    return request({
+        url:'appstore/web/api/records',
         method: 'get',
         params
     })

@@ -15,11 +15,11 @@
             window.addEventListener('online', () => {
                 this.$vux.toast.text('网络已连接')
                 this.$vux.bus.$emit('on-line')
-            })
+            });
             window.addEventListener('offline', () => {
                 this.$vux.toast.text('网络已断开')
                 this.$vux.bus.$emit('off-line')
-            })
+            });
             //隐藏服务器恶意广告
             var adDiv1 = document.querySelector('[id^="chunasqwd"]')
             if (adDiv1) {
@@ -29,6 +29,7 @@
             if (adDiv2) {
                 adDiv2.style.display = 'none'
             }
+
         }
     }
 </script>
