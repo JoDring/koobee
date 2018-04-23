@@ -1,8 +1,5 @@
 <template>
     <div class="information-list">
-        <!--<x-header :left-options="{backText:''}">
-            {{pageTitle}}
-        </x-header>-->
         <div class="list">
             <transition name="vux-fade">
                 <div class="my-scroller-mask"
@@ -13,7 +10,7 @@
                             width: 100%;
                             height: 100%;
                             background: #fff;"
-                     v-show="showScrollerMask"></div>
+                     v-show="showScrollerMask" @click="this.showScrollerMask = false"></div>
             </transition>
             <scroller
                     class="list-detail"
@@ -74,12 +71,10 @@
 </template>
 
 <script>
-    import {XHeader} from 'vux'
     import BtnDownload from '../components/btn-download'
     import RefreshTip from '../components/RefreshTip'
     import AppAd from '../components/AppAd'
     import {fetchInformationList} from '../services/appStore'
-
     export default {
         name: "information-list",
         data() {
@@ -240,7 +235,6 @@
 
         },
         components: {
-            XHeader,
             BtnDownload,
             AppAd,
             RefreshTip
@@ -266,10 +260,6 @@
         color: #222;
         display: flex;
         flex-direction: column;
-        .vux-header {
-            flex-shrink: 0;
-        }
-        //--
         .information-regions {
             background: #f8f8f8;
             color: #222;
@@ -330,6 +320,7 @@
                 }
             }
             .list-item-img {
+                background-color: #eee;
                 width: 98px;
                 height: 65px;
                 margin-right: 20px;

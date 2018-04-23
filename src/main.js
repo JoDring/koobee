@@ -9,11 +9,11 @@ Vue.use(VueScroller)
 import VueLazyload from 'vue-lazyload'
 Vue.use(VueLazyload, {
     preLoad: 1.3,
-    error: 'static/images/palceholder-logo.png',
-    loading: 'static/images/palceholder-logo.png',
+    error: 'static/appStore/palceholder-logo.webp',
+    loading: 'static/appStore/palceholder-logo.webp',
     attempt: 1
 })
-import {AjaxPlugin, LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';
+import {LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';
 Vue.use(ConfigPlugin, {
     $layout: 'VIEW_BOX'
 });
@@ -23,7 +23,6 @@ Vue.use(ToastPlugin);
 Vue.use(ConfirmPlugin);
 Vue.use(AlertPlugin);
 Vue.use(BusPlugin);
-Vue.use(AjaxPlugin);
 /*const FastClick = require('fastclick')
 FastClick.attach(document.body)*/
 Vue.config.productionTip = false;
@@ -31,6 +30,16 @@ Vue.config.productionTip = false;
     //document.title = '努力加载中...'
     next()
 })*/
+//隐藏服务器恶意广告
+//隐藏服务器恶意广告
+var adDiv1 = document.querySelector('[id^="chunasqwd"]')
+if (adDiv1) {
+    adDiv1.style.display = 'none'
+}
+var adDiv2 = document.querySelector('[id^="_embed"]')
+if (adDiv2) {
+    adDiv2.style.display = 'none'
+}
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

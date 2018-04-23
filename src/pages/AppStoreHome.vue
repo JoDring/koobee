@@ -1,7 +1,7 @@
 <template>
     <div class="app-store-home">
         <div style="display: none">
-            <img class="logo" src="src/assets/appStore/logo.png">
+            <img class="logo" src="../assets/appStore/logo.webp">
         </div>
         <div slot="header" class="header"  @click="goToSearchPage">
             <div class="search-home">
@@ -24,7 +24,7 @@
                             width: 100%;
                             height: 100%;
                             background: #fff;"
-                     v-show="showScrollerMask"></div>
+                     v-show="showScrollerMask" @click="this.showScrollerMask = false"></div>
             </transition>
             <scroller
                     ref="scroller"
@@ -59,7 +59,7 @@
             </scroll-to-top>
         </div>
         <div slot="bottom" class="footer" v-show="showFooter">
-            <img class="footer-app-icon" src="../assets/appStore/app-store-icon.png">
+            <img class="footer-app-icon" src="../assets/appStore/app-store-icon.webp">
             <div>
                 <div class="footer-title">应用市场</div>
                 <div class="footer-brief">8.62M</div>
@@ -143,6 +143,7 @@
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
                 }, 250)
                 setTimeout(function () {
+                    console.log('setTimeout')
                     vm.showScrollerMask = false
                 }, 450)
             })

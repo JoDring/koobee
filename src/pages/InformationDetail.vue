@@ -1,8 +1,5 @@
 <template>
     <div class="information-detail">
-        <!--<x-header :left-options="{backText:''}">
-            {{title}}
-        </x-header>-->
         <main class="main">
             <!--<div style="width: 100%; height: 250px" id="aliPlayerContainer"></div>-->
             <div id="information-content" class="information-detail-content">
@@ -34,7 +31,6 @@
 </template>
 
 <script>
-    import {XHeader} from 'vux'
     import sampleSize from 'lodash/sampleSize'
     import BtnDownload from '../components/btn-download'
     import AppAd from '../components/AppAd'
@@ -208,7 +204,6 @@
             }
         },
         components: {
-            XHeader,
             BtnDownload,
             AppAd,
             RefreshTip
@@ -231,9 +226,6 @@
         background: #f5f5f5;
         display: flex;
         flex-direction: column;
-        .vux-header {
-            flex-shrink: 0;
-        }
         .main {
             flex: 1;
             overflow: auto;

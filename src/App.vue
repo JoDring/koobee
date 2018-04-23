@@ -11,7 +11,7 @@
 <script>
     export default {
         name: 'app',
-        created() {
+        mounted() {
             window.addEventListener('online', () => {
                 this.$vux.toast.text('网络已连接')
                 this.$vux.bus.$emit('on-line')
@@ -20,20 +20,15 @@
                 this.$vux.toast.text('网络已断开')
                 this.$vux.bus.$emit('off-line')
             })
-
-        },
-        mounted() {
             //隐藏服务器恶意广告
-            this.$nextTick(function () {
-                let adDiv1 = document.querySelector('[id^="chunasqwd"]')
-                if (adDiv1) {
-                    adDiv1.style.display = 'none'
-                }
-                let adDiv2 = document.querySelector('[id^="_embed"]')
-                if (adDiv2) {
-                    adDiv2.style.display = 'none'
-                }
-            })
+            var adDiv1 = document.querySelector('[id^="chunasqwd"]')
+            if (adDiv1) {
+                adDiv1.style.display = 'none'
+            }
+            var adDiv2 = document.querySelector('[id^="_embed"]')
+            if (adDiv2) {
+                adDiv2.style.display = 'none'
+            }
         }
     }
 </script>

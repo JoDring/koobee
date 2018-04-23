@@ -55,7 +55,8 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/appstore/H5/',
+    assetsPublicPath: 'http://360.cooseatech.cn/appstore/H5/storehome/',
+    // assetsPublicPath: '/appstore/H5/storehome/',
 
     /**
      * Source Maps

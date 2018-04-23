@@ -114,7 +114,7 @@
                             width: 100%;
                             height: 100%;
                             background: #fff;"
-                     v-show="showScrollerMask"></div>
+                     v-show="showScrollerMask" @click="this.showScrollerMask = false"></div>
             </transition>
         </main>
         <!--loading spinner-->

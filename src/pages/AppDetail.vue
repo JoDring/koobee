@@ -1,29 +1,35 @@
 <template>
     <div class="view-container">
         <template v-if="appList.length > 0">
-            <x-header class="view-header" v-if="$route.query.isSub" slot="header" :left-options="{backText: ''}">
-                {{appList.length && appList[0].name}}
-            </x-header>
+            <div class="vux-header view-header" v-if="$route.query.isSub" @click="$router ? $router.back() : window.history.back()">
+                <div class="vux-header-left" >
+                    <a class="vux-header-back"></a>
+                    <div class="left-arrow"></div>
+                </div>
+                <h1 class="vux-header-title">
+                    {{appList.length && appList[0].name}}
+                </h1>
+            </div>
             <div class="view-body">
                 <section class="section-brief">
                     <div class="blur-img-c">
                         <x-img container=".view-body" class="blur-img"
-                               default-src="static/images/palceholder-logo.png"
+                               default-src="static/appStore/palceholder-logo.webp"
                                :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
                         <div class="mask-color"></div>
-                        <img class="mask-img" src="static/images/bg-mask.png" width="720" height="122">
+                        <img class="mask-img" src="../assets/appStore/bg-mask.webp" width="720" height="122">
                     </div>
                     <div class="logo-c">
                         <x-img container=".view-body" class="logo-big"
-                               default-src="static/images/palceholder-logo.png"
+                               default-src="static/appStore/palceholder-logo.webp"
                                :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
                         <div class="inverted-logo-c">
                             <x-img container=".view-body" class="logo-big inverted"
-                                   default-src="static/images/palceholder-logo.png"
+                                   default-src="static/appStore/palceholder-logo.webp"
                                    :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl"
                                    width="180"
                                    height="180">
@@ -46,20 +52,20 @@
                 <section class="app-images">
                     <x-img v-for="item in imgList"
                            class="app-images-item"
-                           default-src="static/images/placeholder-appbg.png"
+                           default-src="static/appStore/placeholder-appbg.webp"
                            container=".app-images"
                            :src="item"
                            :key="item"
                            v-if="onLine">
                     </x-img>
-                    <img class="app-images-item" src="static/images/placeholder-appbg.png" v-else>
+                    <img class="app-images-item" src="static/appStore/placeholder-appbg.webp" v-else>
                 </section>
                 <section class="app-desc-detail">
                     <h2>【应用介绍】</h2>
                     <p :class="{'show-more': showMore}" v-html="appList[0].description"></p>
                 </section>
                 <a href="#" class="arrow-down-c" @click.prevent="showMore = !showMore">
-                    <img src="../assets/arrow-down.png" class="arrow-down" width="60" height="60"
+                    <img src="../assets/arrow-down.webp" class="arrow-down" width="60" height="60"
                          :class="{rotated: showMore}">
                 </a>
                 <section class="app-version">
@@ -71,14 +77,15 @@
                     <div class="app-ad-list">
                         <div class="flexbox">
                             <div class="flexbox-item ad-list-item" v-for="item in sameCatApps" :key="item.id">
-                                <router-link :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
+                                <router-link
+                                        :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
-                                        <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
+                                        <x-img class="logo-sm" default-src="static/appStore/palceholder-logo.webp"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
                                                height="130" v-if="onLine">
                                         </x-img>
-                                        <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                                        <img class="logo-sm" src="static/appStore/palceholder-logo.webp" v-else>
                                     </div>
                                 </router-link>
                                 <h3>{{item.name}}</h3>
@@ -97,14 +104,15 @@
                     <div class="app-ad-list">
                         <div class="flexbox" :gutter="0">
                             <div class="flexbox-item ad-list-item" v-for="item in sameDevApps" :key="item.id">
-                                <router-link :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
+                                <router-link
+                                        :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
-                                        <x-img class="logo-sm" default-src="static/images/palceholder-logo.png"
+                                        <x-img class="logo-sm" default-src="static/appStore/palceholder-logo.webp"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
                                                height="130" v-if="onLine">
                                         </x-img>
-                                        <img class="logo-sm" src="static/images/palceholder-logo.png" v-else>
+                                        <img class="logo-sm" src="static/appStore/palceholder-logo.webp" v-else>
                                     </div>
                                 </router-link>
                                 <h3>{{item.name}}</h3>
@@ -152,9 +160,10 @@
 </template>
 <script>
     import BtnDownload from '../components/btn-download.vue';
-    import {XHeader, XImg, Spinner} from 'vux';
+    import {XImg, Spinner} from 'vux';
     import RefreshTip from '../components/RefreshTip'
-    const url = /szprize\.cn/i.test(location) ? 'http://appstore.szprize.cn/appstore/appinfo/details?appId=' : 'http://192.168.1.148:8090/appstore/appinfo/details?appId=';
+    import {fetchAppDetail} from '../services/appStore'
+
     export default {
         name: 'AppDetail',
         props: {
@@ -225,10 +234,10 @@
         methods: {
             fetchData() {
                 this.loading = true
-                this.$http.get(url.concat(this.appId)).then(res => {
+                fetchAppDetail({appId: this.appId}).then(res => {
                     this.loading = false
-                    if (res.data.code === '0' || res.data.code === 0) {
-                        let data = res.data.data;
+                    if (res.code === '0' || res.code === 0) {
+                        let data = res.data;
                         this.appList = [data.app];
                         if (data.sameCatApps && Array.isArray(data.sameCatApps)) {
                             this.appList = [...this.appList, ...data.sameCatApps];
@@ -262,7 +271,7 @@
                     } else {
                         this.$vux.confirm.show({
                             title: '错误提示',
-                            content: res.data.msg + ', 返回上一页?',
+                            content: res.msg + ', 返回上一页?',
                             onConfirm: () => {
                                 this.$router ? this.$router.back() : window.history.back();
                             }
@@ -283,7 +292,6 @@
         },
         components: {
             BtnDownload,
-            XHeader,
             XImg,
             Spinner,
             RefreshTip
@@ -313,6 +321,102 @@
 </script>
 <style lang="less" scoped>
     @import "../../node_modules/vux/src/styles/weui/base/fn.less";
+    .vux-header {
+        position: relative;
+        padding: 3px 0;
+        box-sizing: border-box;
+        background-color: @header-background-color;
+    }
+
+    .vux-header .vux-header-title {
+        line-height: 40px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 400;
+        color: @header-title-color;
+    }
+
+    .vux-header-title-area, .vux-header .vux-header-title {
+        margin: 0 88px;
+        height: 40px;
+        width: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .vux-header .vux-header-title > span {
+        display: inline-block;
+    }
+
+    .vux-header .vux-header-left, .vux-header .vux-header-right {
+        position: absolute;
+        top: 14px;
+        display: block;
+        font-size: 14px;
+        line-height: 21px;
+        color: @header-text-color;
+    }
+
+    .vux-header .vux-header-left a, .vux-header .vux-header-left button, .vux-header .vux-header-right a, .vux-header .vux-header-right button {
+        float: left;
+        margin-right: 8px;
+        color: @header-text-color;
+    }
+
+    .vux-header .vux-header-left a:active, .vux-header .vux-header-left button:active, .vux-header .vux-header-right a:active, .vux-header .vux-header-right button:active {
+        opacity: .5
+    }
+
+    .vux-header .vux-header-left {
+        left: 18px
+    }
+
+    .vux-header .vux-header-left .vux-header-back {
+        padding-left: 16px
+    }
+
+    .vux-header .vux-header-left .left-arrow {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        top: -5px;
+        left: -5px;
+
+        &:before {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 1px solid @header-arrow-color;
+            border-width: 1px 0 0 1px;
+            transform: rotate(315deg);
+            top: 8px;
+            left: 7px;
+        }
+    }
+
+    .vux-header .vux-header-right {
+        right: 15px
+    }
+
+    .vux-header .vux-header-right a, .vux-header .vux-header-right button {
+        margin-left: 8px;
+        margin-right: 0
+    }
+
+    .vux-header .vux-header-right .vux-header-more:after {
+        content: "\2022\0020\2022\0020\2022\0020";
+        font-size: 16px;
+    }
+
+    .vux-header-fade-in-right-enter-active {
+        animation: fadeinR .5s;
+    }
+
+    .vux-header-fade-in-left-enter-active {
+        animation: fadeinL .5s;
+    }
 
     h1 {
         font-size: 32px/@ratio;

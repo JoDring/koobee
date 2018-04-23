@@ -7,6 +7,13 @@ export function fetchHome(params) {
         params
     })
 }
+export function fetchAppDetail(params) {
+    return request({
+        url:'appstore/appinfo/details',
+        method: 'get',
+        params
+    })
+}
 export function fetchNeed(params) {
     return request({
         url:'appstore/html/api/need',
@@ -64,7 +71,9 @@ export function fetchSearchHotWords() {
         method: 'get'
     })
 }
-// 资讯
+
+
+// ---资讯
 export function fetchInformationList(params) {
     return request({
         url:'appstore/html/api/information/list',

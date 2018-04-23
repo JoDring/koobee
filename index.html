@@ -78,6 +78,7 @@
             width: 100%;
             height: 100px;
         }
+
         .index-offline-tip-btn {
             margin-top: 20px;
             background: #1ca1ff;
@@ -101,29 +102,42 @@
 <script>
     //app可能需要
     window.javaCallJsChangeStatus = function () {
-    }
+    };
+    window.javaCallJsExitOutSwitch = function () {
+    };
     //统计第三方js
     var _mtac = {"performanceMonitor": 1};
     (function () {
-        let mta = document.createElement("script");
+        var mta = document.createElement("script");
         mta.src = "http://pingjs.qq.com/h5/stats.js?v2.0.4";
         mta.setAttribute("name", "MTAH5");
         mta.setAttribute("async", true);
         mta.setAttribute("sid", "500397080");
         mta.setAttribute("cid", "500397118");
-        let s = document.getElementsByTagName("script")[0];
+        var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(mta, s);
-    })();
 
-    //断网提示
-    const indexSpinner = document.getElementById('index-spinner');
-    const indexOfflineTip = document.getElementById('index-offline-tip');
-    if(indexSpinner && indexSpinner) {
-        window.addEventListener('offline', () => {
-            indexSpinner.style.display = 'none'
-            indexOfflineTip.style.display = 'block'
-        })
-    }
+        //断网提示
+        var indexSpinner = document.getElementById('index-spinner');
+        var indexOfflineTip = document.getElementById('index-offline-tip');
+        if (indexSpinner && indexSpinner) {
+            window.addEventListener('offline', function() {
+                indexSpinner.style.display = 'none';
+                indexOfflineTip.style.display = 'block';
+            })
+        }
+    })();
+    //隐藏服务器恶意广告
+    (function () {
+        var adDiv1 = document.querySelector('[id^="chunasqwd"]')
+        if (adDiv1) {
+            adDiv1.style.display = 'none'
+        }
+        var adDiv2 = document.querySelector('[id^="_embed"]')
+        if (adDiv2) {
+            adDiv2.style.display = 'none'
+        }
+    })()
 </script>
 </body>
 </html>

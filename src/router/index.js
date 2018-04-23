@@ -12,10 +12,6 @@ const AppStoreApps = () => import(/* webpackChunkName: "appStore" */ '../pages/A
 const InformationList = () => import(/* webpackChunkName: "information" */ '../pages/InformationList.vue');
 const InformationDetail = () => import(/* webpackChunkName: "information" */ '../pages/InformationDetail.vue');
 
-const Lottery = () => import('../components/Lottery.vue')
-const LotteryYuandan2017 = () => import('../components/Lottery-yuandan2017.vue');
-const LotteryChunjie2018 = () => import('../components/Lottery-chunjie2018.vue');
-
 export default new Router({
     routes: [
         {
@@ -71,31 +67,6 @@ export default new Router({
             name: 'H5Games',
             component: H5Games,
             props: true
-        },
-        {
-            path: '/Lottery/:id',
-            component: Lottery,
-            props: true,
-            children: [
-                {
-                    path: '',
-                    name: 'lotteryDefault',
-                    component: LotteryYuandan2017,
-                    props: true
-                },
-                {
-                    path: 'yuandan2017',
-                    name: 'LotteryYuandan2017',
-                    component: LotteryYuandan2017,
-                    props: true
-                },
-                {
-                    path: 'chunjie2018',
-                    name: 'LotteryChunjie2018',
-                    component: LotteryChunjie2018,
-                    props: true
-                }
-            ]
         },
         {
             path: '/*',
