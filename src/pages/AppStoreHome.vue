@@ -143,7 +143,6 @@
                     vm.$refs['scroller'] && vm.$refs['scroller'].scrollTo(0, vm.scrollPosition.y, true)
                 }, 250)
                 setTimeout(function () {
-                    console.log('setTimeout')
                     vm.showScrollerMask = false
                 }, 450)
             })
