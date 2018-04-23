@@ -1,6 +1,6 @@
 import Router from 'vue-router';
 
-const NotFound = () => import('../components/NotFound.vue');
+const NotFound = () => import('../pages/NotFound.vue');
 const H5Games = () => import('../components/H5Games.vue');
 
 const AppStoreHome = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreHome.vue');
