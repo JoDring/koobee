@@ -593,7 +593,7 @@
             },
             /*跳转详情*/
             jumpToDetail(app) {
-                //JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
+                JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
             },
             //下载所有
             handleDownloadAll() {
