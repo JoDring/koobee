@@ -255,7 +255,6 @@
         background-size: cover;
         &:active {
             border-color: transparent;
-            background-image: url("../../static/images/lottery/wuyi2018/btn-gray.webp");
             &::after {
                 border: none;
                 background-color: transparent;

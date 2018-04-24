@@ -9,12 +9,10 @@
             </button>
             <img src="../../static/images/lottery/wuyi2018/bg.webp" class="bg-img">
             <img src="../../static/images/lottery/wuyi2018/butterfly.gif" class="bg-decoration">
-            <marquee class="gamer-list text-shadow" v-if="records.length > 0">
+            <marquee class="gamer-list text-shadow" v-show="records.length > 0">
                 <marquee-item v-for="(item, index) in records" :key="index">
                     <span class="text-secondary">
-                        中奖播报</span>
-                    <x-icon type="volume-medium" size="17" class="icon-laba"></x-icon>
-                    恭喜 {{item.tel}}<span class="text-secondary"> 获得 </span>{{item.name}}
+                        中奖播报</span><x-icon type="volume-medium" size="17" class="icon-laba"></x-icon>恭喜{{item.tel}} <span class="text-secondary">获得</span> {{item.name}}
                 </marquee-item>
             </marquee>
             <button @click="handleDownloadAll"
@@ -397,9 +395,7 @@
                             return;
                         }
                         JsCallApp.alertAToast('领取中...');
-                        window.setTimeout(() => {
-                            JsCallApp.handleAppAction(JSON.stringify(app), 'open');
-                        }, 500);
+                        JsCallApp.handleAppAction(JSON.stringify(app), 'open');
                         //需要先打开一次才可以抽奖
                         this.apps = this.apps.map((v) => {
                             if (app.id === v.id) {
@@ -415,82 +411,129 @@
                                 return v;
                             }
                         });
-                        //必须异步
-                        this.drawTimer = window.setTimeout(() => {
-                            let resp = JSON.parse(JsCallApp.requestServer('/web/download', 'accountId=' + this.userInfo.userId + '&activityId=' + this.detail.id + '&tel=' + this.userInfo.phone + '&appId=' + app.id + '&packageName=' + app.packageName));
-                            if (String(resp.code) === '0') {
-                                if (resp.msg === 'done') {
-                                    JsCallApp.alertAToast('该应用已领过');
-                                    this.apps = this.apps.map((v) => {
-                                        if (app.id === v.id) {
-                                            if (String(v.action) === 'draw') {
-                                                return {
-                                                    ...v,
-                                                    action: 'draw',
-                                                    istatus: -1, //0 可领取 -1不可领取
-                                                    btnState: {
-                                                        ...v.btnState,
-                                                        btnText: '抽奖'
-                                                    }
-                                                }
-                                            } else {
-                                                return {
-                                                    ...v,
-                                                    action: 'open',
-                                                    istatus: -1, //0 可领取 -1不可领取
-                                                    btnState: {
-                                                        ...v.btnState,
-                                                        btnText: '已抽奖'
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            return v;
+
+                        let getTimer = window.setTimeout(() => {
+                            this.apps = this.apps.map((v) => {
+                                if (app.id === v.id) {
+                                    return {
+                                        ...v,
+                                        action: 'get',
+                                        btnState: {
+                                            ...v.btnState,
+                                            btnText: '领取'
                                         }
-                                    });
-                                    this.setCacheAppsAction(this.apps);
-                                    window.MtaH5 && window.MtaH5.clickStat('A' + this.detail.id + '_done_' + app.id + '_' + app.packageName + '_' + app.name);
-                                    window.MtaH5 && window.MtaH5.clickStat('click_app_done', {
-                                        'activityid': this.detail.id,
-                                        'name': app.name,
-                                        'packagename': app.packageName
-                                    });
+                                    }
                                 } else {
-                                    JsCallApp.alertAToast('抽奖机会+1');
-                                    this.apps = this.apps.map((v) => {
-                                        if (app.id === v.id) {
+                                    return v;
+                                }
+                            });
+                            JsCallApp.alertAToast('网络请求超时!');
+                        }, 6000);
+                        let resp = JSON.parse(JsCallApp.requestServer('/web/download', 'accountId=' + this.userInfo.userId + '&activityId=' + this.detail.id + '&tel=' + this.userInfo.phone + '&appId=' + app.id + '&packageName=' + app.packageName));
+                        window.clearTimeout(getTimer);
+                        if (String(resp.code) === '0') {
+                            if (resp.msg === 'done') {
+                                JsCallApp.alertAToast('该应用已领过');
+                                this.apps = this.apps.map((v) => {
+                                    if (app.id === v.id) {
+                                        if (String(v.action) === 'draw') {
                                             return {
                                                 ...v,
-                                                action: 'draw', //抽奖
-                                                istatus: -1, //0或者1表示 可领取 -1不可领取
+                                                action: 'draw',
+                                                istatus: -1, //0 可领取 -1不可领取
                                                 btnState: {
                                                     ...v.btnState,
                                                     btnText: '抽奖'
                                                 }
                                             }
                                         } else {
-                                            return v;
+                                            return {
+                                                ...v,
+                                                action: 'open',
+                                                istatus: -1, //0 可领取 -1不可领取
+                                                btnState: {
+                                                    ...v.btnState,
+                                                    btnText: '已抽奖'
+                                                }
+                                            }
                                         }
-                                    });
-                                    this.setCacheAppsAction(this.apps);
-                                    window.MtaH5 && window.MtaH5.clickStat('A' + this.detail.id + '_get_' + app.id + '_' + app.packageName + '_' + app.name);
-                                    window.MtaH5 && window.MtaH5.clickStat('click_app_get', {
-                                        'activityid': this.detail.id,
-                                        'name': app.name,
-                                        'packagename': app.packageName
-                                    });
-                                }
-                            } else {
-                                JsCallApp.alertAToast(resp.msg);
+                                    } else {
+                                        return v;
+                                    }
+                                });
                                 this.setCacheAppsAction(this.apps);
-                                window.MtaH5 && window.MtaH5.clickStat('click_app_error', {
+                                window.MtaH5 && window.MtaH5.clickStat('A' + this.detail.id + '_done_' + app.id + '_' + app.packageName + '_' + app.name);
+                                window.MtaH5 && window.MtaH5.clickStat('click_app_done', {
+                                    'activityid': this.detail.id,
+                                    'name': app.name,
+                                    'packagename': app.packageName
+                                });
+                            } else {
+                                JsCallApp.alertAToast('抽奖机会+1');
+                                this.apps = this.apps.map((v) => {
+                                    if (app.id === v.id) {
+                                        return {
+                                            ...v,
+                                            action: 'draw', //抽奖
+                                            istatus: -1, //0或者1表示 可领取 -1不可领取
+                                            btnState: {
+                                                ...v.btnState,
+                                                btnText: '抽奖'
+                                            }
+                                        }
+                                    } else {
+                                        return v;
+                                    }
+                                });
+                                this.setCacheAppsAction(this.apps);
+                                window.MtaH5 && window.MtaH5.clickStat('A' + this.detail.id + '_get_' + app.id + '_' + app.packageName + '_' + app.name);
+                                window.MtaH5 && window.MtaH5.clickStat('click_app_get', {
                                     'activityid': this.detail.id,
                                     'name': app.name,
                                     'packagename': app.packageName
                                 });
                             }
-                            this.getting = false;
-                        }, 2000);
+                        } else {
+                            JsCallApp.alertAToast(resp.msg);
+                            if (String(this.detail.istatus) === '1') { //活动结束
+                                this.apps = this.apps.map((v) => {
+                                    if (app.id === v.id) {
+                                        return {
+                                            ...v,
+                                            istatus: -1,
+                                            action: 'open',
+                                            btnState: {
+                                                ...v.btnState,
+                                                btnText: '打开'
+                                            }
+                                        }
+                                    } else {
+                                        return v;
+                                    }
+                                });
+                            } else if (String(this.detail.istatus) === '-1') { //活动未开始
+                                this.apps = this.apps.map((v) => {
+                                    if (app.id === v.id) {
+                                        return {
+                                            ...v,
+                                            action: 'get',
+                                            btnState: {
+                                                ...v.btnState,
+                                                btnText: '领取'
+                                            }
+                                        }
+                                    } else {
+                                        return v;
+                                    }
+                                });
+                            }
+                            this.setCacheAppsAction(this.apps);
+                            window.MtaH5 && window.MtaH5.clickStat('click_app_error', {
+                                'activityid': this.detail.id,
+                                'name': app.name,
+                                'packagename': app.packageName
+                            });
+                        }
                     } else if (app.action === 'draw') { //--抽奖
                         this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo()) || {};
                         if (!this.userInfo || !this.userInfo.userId) {
@@ -498,10 +541,22 @@
                             return;
                         }
                         this.callServerGetAwardResp(app);
-                    }
-                    else { //--打开
+                    } else {
+                        //初始化的istatus 0(未安装)和1(已经安装), 安装 升级 继续 action 记录一下app按钮 改成2(可领取)
+                        if (!(app.action === 'open')) {
+                            this.apps = this.apps.map(v => {
+                                if (app.id === v.id) {
+                                    return {
+                                        ...v,
+                                        istatus: 2,
+                                    }
+                                } else {
+                                    return v;
+                                }
+                            });
+                            this.setCacheAppsAction(this.apps);
+                        }
                         JsCallApp.handleAppAction(JSON.stringify(app), app.action);
-                        window.MtaH5 && window.MtaH5.clickStat('A' + this.detail.id + '_' + app.action + '_' + app.id + '_' + app.packageName + '_' + app.name);
                         window.MtaH5 && window.MtaH5.clickStat('click_app_' + app.action, {
                             'activityid': this.detail.id,
                             'name': app.name,
@@ -516,6 +571,7 @@
                     if (app.id === v.id) {
                         return {
                             ...v,
+                            imgAnimated: true,
                             action: '',
                             btnState: {
                                 ...v.btnState,
@@ -551,34 +607,35 @@
                     }
                     window.setTimeout(() => {
                         this.showDialog = true;
-                    }, 500);
+                    }, 1000);
 
                     //抽奖后
-                    this.apps = this.apps.map((v) => {
-                        if (app.id === v.id) {
-                            return {
-                                ...v,
-                                imgAnimated: true,
-                                action: 'open',
-                                istatus: -1,
-                                btnState: {
-                                    ...v.btnState,
-                                    btnText: '已抽奖'
+                    setTimeout(() => {
+                        this.apps = this.apps.map((v) => {
+                            if (app.id === v.id) {
+                                return {
+                                    ...v,
+                                    action: 'open',
+                                    istatus: -1,
+                                    btnState: {
+                                        ...v.btnState,
+                                        btnText: '已抽奖'
+                                    }
                                 }
+                            } else {
+                                return v;
                             }
-                        } else {
-                            return v;
-                        }
-                    });
-                    //缓存
-                    this.setCacheAppsAction(this.apps);
-                    window.MtaH5 && window.MtaH5.clickStat('activity_click_getaward', {
-                        'activityid': this.detail.id,
-                        'name': app.name,
-                        'packagename': app.packageName,
-                        'userphone': this.userInfo.phone,
-                        'userid': this.userInfo.userId
-                    });
+                        });
+                        //缓存
+                        this.setCacheAppsAction(this.apps);
+                        window.MtaH5 && window.MtaH5.clickStat('activity_click_getaward', {
+                            'activityid': this.detail.id,
+                            'name': app.name,
+                            'packagename': app.packageName,
+                            'userphone': this.userInfo.phone,
+                            'userid': this.userInfo.userId
+                        });
+                    }, 2000)
                 } else {
                     JsCallApp.alertAToast(resp.msg);
                     this.apps = this.apps.map((v) => {
@@ -608,8 +665,19 @@
                         let appStatus = JsCallApp.getAppStatus(v.packageName, v.id, v.versionCode);
                         if (appStatus == appState.FINAL_DOWNLOAD || appStatus == appState.FINAL_PAUSE) {
                             JsCallApp.handleAppAction(JSON.stringify(v), 'download');
+                            this.apps = this.apps.map(m => {
+                                if (v.id === m.id) {
+                                    return {
+                                        ...m,
+                                        istatus: 2,
+                                    }
+                                } else {
+                                    return m;
+                                }
+                            });
                         }
                     });
+                    this.setCacheAppsAction(this.apps);
                     window.MtaH5 && window.MtaH5.clickStat('activity_click_dowloadall', {
                         'activityid': this.detail.id,
                         'userphone': this.userInfo.phone,
@@ -641,7 +709,6 @@
                         return {
                             ...state,
                             action: 'open',
-//              action: 'draw', //for test
                             btnState: {
                                 ...state.btnState,
                                 percentage: 100,
@@ -652,7 +719,6 @@
                         return {
                             ...state,
                             action: 'get',
-//              action: 'draw', //for test
                             btnState: {
                                 ...state.btnState,
                                 percentage: 100,
