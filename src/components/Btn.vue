@@ -33,8 +33,8 @@
         },
         mounted() {
             /*window.javaCallJsChangeStatus = this.changeState.bind(this);
-            window.downloadBtnClickCallBack = this.changeState.bind(this);
-            window.requestServerByAsyncCallBack = (type, status, json) => {};*/
+            window.downloadBtnClickCallBack = this.changeState.bind(this);*/
+            window.requestServerByAsyncCallBack = (type, status, json) => {};
             window.jsObj && this.changeState();
         },
         watch: {

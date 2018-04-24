@@ -33,11 +33,30 @@
                         <div class="list-item-txt">
                             <div class="list-item-name">{{item.title}}</div>
                             <div class="list-item-brief">
-                                <span>《{{item.appName}}》</span>
+                                <span>hot:{{item.hot || 1}}k</span>
                                 <span>{{item.timeStr | timeFormat}}</span>
                             </div>
                         </div>
                     </div>
+                    <div class="app-info" v-if="item.app">
+                        <div class="app-info-detail" @click="openApps(item.app)">
+                            <div class="app-info-icon-c">
+                                <img class="app-info-icon" v-lazy="item.app.iconUrl" v-if="onLine">
+                                <img class="app-info-icon" src="static/images/palceholder-logo.png" v-else>
+                            </div>
+                            <div class="tag">推荐</div>
+                            <div class="app-name">{{item.appName}}</div>
+                        </div>
+                        <btn class="app-info-btn"
+                             :app="item.app"
+                             ref="appBtn"
+                             style="width: 55px;
+                                    height: 25px;
+                                    border-radius: 13px;
+                                    font-size: 12px;">
+                        </btn>
+                    </div>
+                    <div class="item-line"></div>
                 </div>
                 <svg class="spinner" style="fill: #ff6b3b;" slot="infinite-spinner" viewBox="0 0 64 64">
                     <g>
@@ -67,14 +86,19 @@
             </refresh-tip>
         </div>
         <app-ad v-if="app" :app="app"></app-ad>
+        <div v-if="gameApp" class="gamecenter-ad" @click="openGameCenter">
+            <img :src="gameApp.iconUrl" class="gamecenter-ad-icon">
+            更多精彩游戏就在{{gameApp.name}}
+        </div>
     </div>
 </template>
 
 <script>
-    import BtnDownload from '../components/btn-download'
+    import Btn from '../components/Btn'
     import RefreshTip from '../components/RefreshTip'
     import AppAd from '../components/AppAd'
     import {fetchInformationList} from '../services/appStore'
+    import JsCallApp from '../util/JsCallApp'; //客户端api
     export default {
         name: "information-list",
         data() {
@@ -82,6 +106,7 @@
                 list: [],
                 regions: [],
                 app: null,
+                gameApp: null,
                 loading: false,
                 queryData: {
                     packageName: this.$route.query.packageName ? this.$route.query.packageName : '',
@@ -91,7 +116,7 @@
                 failLoaded: false,
                 onLine: window.navigator.onLine,
                 scrollPosition: {x: 0, y: 0, animate: false},
-                showScrollerMask: false
+                showScrollerMask: false,
             }
         },
         props: {
@@ -123,6 +148,10 @@
             this.$vux.bus.$on('on-line', () => {
                 this.onLine = true
             })
+        },
+        mounted() {
+            window.javaCallJsChangeStatus = this.updateBtn.bind(this);
+            window.downloadBtnClickCallBack = this.updateBtn.bind(this);
         },
         beforeRouteUpdate(to, from, next) {
             if (to.query.packageName) {
@@ -168,18 +197,11 @@
                 document.title = this.title
                 if (res.data) {
                     if (this.queryData.pageIndex === 1) {
-                        if (res.data.regions) {
-                            this.regions = res.data.regions
-                        } else {
-                            this.regions = []
-                        }
+                        this.regions = res.data.regions ? res.data.regions : []
+                        this.gameApp = res.data.gameApp ? res.data.gameApp : null
+                        this.app = res.data.app ? res.data.app : null
                     }
-                    if (res.data.app) {
-                        this.app = res.data.app
-                    }
-                    if (refresh) {
-                        this.list = []
-                    }
+                    refresh && (this.list = [])
                     if (res.data.list && res.data.list.length) {
                         this.list = [...this.list, ...res.data.list]
                     } else {
@@ -228,14 +250,26 @@
             goToPackageList(item) {
                 this.$router.push({
                     name: 'InformationList',
-                    params:{title: item.title},
+                    params: {title: item.title},
                     query: {packageName: item.packageName}
                 })
+            },
+            updateBtn() {
+                this.$refs.appBtn.forEach((value) => {
+                    if (typeof value.changeState === 'function') {
+                        value.changeState()
+                    }
+                })
+            },
+            openGameCenter() {
+                window.open('gamecenter://home?page=selected_page')
+            },
+            openApps(app) {
+                window.jsObj && JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
             }
-
         },
         components: {
-            BtnDownload,
+            Btn,
             AppAd,
             RefreshTip
         },
@@ -311,13 +345,12 @@
                 background: #fff;
                 padding: 0 13px;
                 position: relative;
+                z-index: 2;
                 text-align: justify;
                 &:active {
                     background-color: #eee;
                 }
-                &:after {
-                    .setBottomLine(#f1f1f1)
-                }
+
             }
             .list-item-img {
                 background-color: #eee;
@@ -349,17 +382,97 @@
                 display: flex;
                 justify-content: space-between;
             }
-            .btn-download {
-                width: 60px;
-                height: 25px;
-                font-size: 12px;
-                position: absolute;
-                right: 13px;
-                top: 0;
-                bottom: 0;
-                margin: auto;
+            //line
+            .item-line {
+                width: 100%;
+                height: 1px;
+                position: relative;
+                &:after {
+                    .setBottomLine(#f1f1f1)
+                }
+            }
+            //app信息
+            .app-info {
+                display: flex;
+                width: 100%;
+                height: 40px;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 13px;
+                box-sizing: border-box;
+                position: relative;
+                z-index: 1;
+                margin-top: -8px;
+                color: #666;
+                .app-info-detail {
+                    height: 100%;
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                }
+                .app-info-icon-c {
+                    width: 25px;
+                    height: 25px;
+                    overflow: hidden;
+                    border-radius: 4px;
+                }
+                .app-info-icon {
+                    width: 100%;
+                }
+                .app-name {
+                    white-space: nowrap;
+                    max-width: 180px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    font-size: 13px;
+                }
+                .tag {
+                    margin:0 4px;
+                    padding: 0 1px;
+                    font-size: 10px;
+                    color: #ccc;
+                    position: relative;
+                    &:after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 44px;
+                        height: 28px;
+                        border: 1px solid #ccc;
+                        transform: scale(.5);
+                        transform-origin: 0 0;
+                    }
+                }
+                .app-info-btn {
+                    flex-shrink: 1;
+                }
             }
         }
-
+        //
+        .gamecenter-ad {
+            position: fixed;
+            z-index: 9;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 63px;
+            background-color: #fff;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding: 0 13px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            font-size: 15px;
+            &:before {
+                .setTopLine()
+            }
+        }
+        .gamecenter-ad-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 5px;
+        }
     }
 </style>
