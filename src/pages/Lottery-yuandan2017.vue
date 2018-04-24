@@ -23,7 +23,8 @@
                         <div class="item-bg animated" :class="{rotate: item.imgAnimated}"
                              :style="{'background-image': `url(${path}/static/images/lottery/snow/item-bgs/${index+1}.webp)`}"></div>
                         <x-img @click.native="handleImgClick(item)" :src="item.iconUrl" class="item-logo"
-                               container="#vux_view_box_body"></x-img>
+                               container="#vux_view_box_body">
+                        </x-img>
                     </div>
                     <h1 class="item-title">{{item.name}}</h1>
                     <btn-download v-if="item.btnState"
@@ -209,7 +210,7 @@
         name: 'LotteryYuandan',
         data() {
             return {
-                path: process.env.NODE_ENV === 'production' ? '\/appstore\/H5/activity' : '',  //重要: build的时候需要修改, dev= '' product= '\/appstore\/H5'
+                path:'http://360.cooseatech.cn/appstore/H5/activity',
                 apps: [],
                 detail: {},
                 records: [], //中奖名单
