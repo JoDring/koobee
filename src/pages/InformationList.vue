@@ -33,7 +33,7 @@
                         <div class="list-item-txt">
                             <div class="list-item-name">{{item.title}}</div>
                             <div class="list-item-brief">
-                                <span>hot:{{item.hot || 1}}k</span>
+                                <span>{{item.hotValue || 2000}}次阅读</span>
                                 <span>{{item.timeStr | timeFormat}}</span>
                             </div>
                         </div>
@@ -44,18 +44,21 @@
                                 <img class="app-info-icon" v-lazy="item.app.iconUrl" v-if="onLine">
                                 <img class="app-info-icon" src="static/images/palceholder-logo.png" v-else>
                             </div>
-                            <div class="tag">推荐</div>
-                            <div class="app-name">{{item.appName}}</div>
+                            <div class="app-name-c">
+                                <div class="app-name">{{item.appName}}</div>
+                                <div class="tag">推荐</div>
+                            </div>
                         </div>
                         <btn class="app-info-btn"
                              :app="item.app"
                              ref="appBtn"
                              style="width: 55px;
-                                    height: 25px;
-                                    border-radius: 13px;
+                                    height: 24px;
+                                    border-radius: 12px;
                                     font-size: 12px;">
                         </btn>
                     </div>
+                    <div v-else style="height: 5px"></div>
                     <div class="item-line"></div>
                 </div>
                 <svg class="spinner" style="fill: #ff6b3b;" slot="infinite-spinner" viewBox="0 0 64 64">
@@ -85,10 +88,20 @@
                          @click.native="getInformationList">
             </refresh-tip>
         </div>
-        <app-ad v-if="app" :app="app"></app-ad>
-        <div v-if="gameApp" class="gamecenter-ad" @click="openGameCenter">
+        <app-ad v-if="app" :app="app">
+        </app-ad>
+        <div v-else-if="gameApp" class="gamecenter-ad" @click="openApps(gameApp)">
             <img :src="gameApp.iconUrl" class="gamecenter-ad-icon">
-            更多精彩游戏就在{{gameApp.name}}
+            <div style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
+            <btn class="app-info-btn"
+                 @click.native="openGameCenter"
+                 :app="gameApp"
+                 ref="appBtn"
+                 style="width: 75px;
+                        height: 30px;
+                        border-radius: 15px;
+                        font-size: 15px;">
+            </btn>
         </div>
     </div>
 </template>
@@ -338,12 +351,11 @@
         }
         .list-detail {
             .list-item-c {
-                height: 100px;
+                height: 90px;
                 display: flex;
-                align-items: center;
                 box-sizing: border-box;
                 background: #fff;
-                padding: 0 13px;
+                padding: 15px 13px 10px;
                 position: relative;
                 z-index: 2;
                 text-align: justify;
@@ -356,7 +368,7 @@
                 background-color: #eee;
                 width: 98px;
                 height: 65px;
-                margin-right: 20px;
+                margin-right: 11px;
                 flex-shrink: 0;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -371,6 +383,7 @@
                 justify-content: space-between;
             }
             .list-item-name {
+                margin-top: 2px;
                 font-size: 14px;
                 line-height: 1.4;
                 color: @black;
@@ -395,54 +408,54 @@
             .app-info {
                 display: flex;
                 width: 100%;
-                height: 40px;
+                height: 42px;
                 justify-content: space-between;
-                align-items: center;
                 padding: 0 13px;
                 box-sizing: border-box;
                 position: relative;
                 z-index: 1;
-                margin-top: -8px;
                 color: #666;
                 .app-info-detail {
                     height: 100%;
                     flex: 1;
                     display: flex;
-                    align-items: center;
                 }
                 .app-info-icon-c {
-                    width: 25px;
-                    height: 25px;
+                    width: 27px;
+                    height: 27px;
                     overflow: hidden;
                     border-radius: 4px;
+                    flex-shrink: 0;
                 }
                 .app-info-icon {
                     width: 100%;
+                }
+                .app-name-c{
+                    height: 27px;
+                    display: flex;
+                    align-items: center;
                 }
                 .app-name {
                     white-space: nowrap;
                     max-width: 180px;
                     overflow: hidden;
+                    font-size: 15px;
                     text-overflow: ellipsis;
-                    font-size: 13px;
+                    margin:0 10px;
+                    color: #222222;
                 }
                 .tag {
-                    margin:0 4px;
-                    padding: 0 1px;
+                    line-height: 14px;
+                    text-align: center;
                     font-size: 10px;
-                    color: #ccc;
+                    color: #02c5aa;
+                    border: 1px solid #02c5aa;
+                    border-radius: 2px;
+                    box-sizing: border-box;
+                    width: 27px;
+                    height: 15px;
+                    white-space: nowrap;
                     position: relative;
-                    &:after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 44px;
-                        height: 28px;
-                        border: 1px solid #ccc;
-                        transform: scale(.5);
-                        transform-origin: 0 0;
-                    }
                 }
                 .app-info-btn {
                     flex-shrink: 1;
@@ -456,9 +469,9 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 63px;
-            background-color: #fff;
-            color: #333;
+            height: 62px;
+            background-color: rgba(255,255,255,.94);
+            color: #2b2b2b;
             display: flex;
             align-items: center;
             padding: 0 13px;
@@ -466,13 +479,25 @@
             flex-shrink: 0;
             font-size: 15px;
             &:before {
-                .setTopLine()
+                .setTopLine(#e4e4e4)
+            }
+            &:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                width: 335/2*1px;
+                height: 135/2*1px;
+                background: url("../assets/gameCenter/gamecenter-ad.webp") no-repeat;
+                background-size: 100%;
             }
         }
         .gamecenter-ad-icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 5px;
+            width: 38px;
+            height: 38px;
+            margin-right: 9px;
         }
     }
 </style>

@@ -312,7 +312,7 @@
             .list-item-img {
                 width: 98px;
                 height: 65px;
-                margin-right: 20px;
+                margin-right: 11px;
                 flex-shrink: 0;
                 background-color: #eee;
                 background-repeat: no-repeat;
