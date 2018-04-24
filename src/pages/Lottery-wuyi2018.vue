@@ -24,7 +24,8 @@
             <div class="app-list" v-if="apps.length > 0">
                 <div class="list-item" v-for="(item, index) in apps" :key="item.id">
                     <div class="img-c" @click="handleImgClick(item)">
-                        <x-img v-if="onLine" :src="item.iconUrl" class="item-logo animated" :class="{rubberBand: item.imgAnimated}"
+                        <x-img v-if="onLine" :src="item.iconUrl" class="item-logo animated"
+                               :class="{rubberBand: item.imgAnimated}"
                                container=".lottery">
                         </x-img>
                         <div class="item-bg"></div>
@@ -65,7 +66,7 @@
                       dialog-transition="none" mask-transition="none"
             >
                 <!--实物-->
-                <div class="form-big" v-show="showDialogType === 'form-big'">
+                <div class="form-big" v-if="showDialogType === 'form-big'">
                     <group class="dialog-form">
                         <div class="dialog-form-title">获得<strong>{{award.name}}</strong></div>
                         <x-input ref="name" :show-clear="false" v-model="userInput.name" :min="2" :required="true"
@@ -95,14 +96,16 @@
                 </div>
 
                 <!--流量-->
-                <div class="form-big form-sm" v-show="showDialogType === 'form-sm'">
+                <div class="form-big form-sm" v-if="showDialogType === 'form-sm'">
                     <group class="dialog-form">
                         <div class="dialog-form-title">获得<strong>{{award.name}}</strong></div>
-                        <x-input :show-clear="false" v-model="userInput.tel" type="tel" is-type="china-mobile" :max="13"
+                        <x-input ref="tel" :show-clear="false" v-model="userInput.tel" type="tel" is-type="china-mobile"
+                                 :max="13"
                                  :required="true" placeholder=" " @on-focus="setDefaultTel">
                             <label slot="label" class="dialog-form-label"><span class="star">*</span>联系电话:</label>
                         </x-input>
-                        <x-input :show-clear="false" v-model="userInput.qq" :min="5" type="number" :required="true"
+                        <x-input ref="qq" :show-clear="false" v-model="userInput.qq" :min="5" type="number"
+                                 :required="true"
                                  placeholder=" ">
                             <label slot="label" class="dialog-form-label"><span class="star">*</span>QQ号:</label>
                         </x-input>
@@ -113,7 +116,7 @@
                 </div>
 
                 <!--note-->
-                <div class="form-big note" v-show="showDialogType === 'note'">
+                <div class="form-big note" v-if="showDialogType === 'note'">
                     <group class="dialog-form">
                         <div class="dialog-form-title">获得<strong>{{award.name}}</strong></div>
                     </group>
@@ -123,7 +126,7 @@
                 </div>
 
                 <!--积分-->
-                <div class="form-big integral" v-show="showDialogType === 'integral'">
+                <div class="form-big integral" v-if="showDialogType === 'integral'">
                     <group class="dialog-form">
                         <div class="dialog-form-title">获得<strong>{{award.name}}</strong></div>
                     </group>
@@ -186,10 +189,12 @@
     import BtnDownload from '../components/btn-download.vue';
     import JsCallApp, {appState} from '../util/JsCallApp'; //客户端api
     import {fetchLotteryDetail, fetchLotteryRecords, clearTestCache} from '../services/appStore'
+
     // for debugger
     function alertObj(obj) {
         alert(JSON.stringify(obj, null, 4))
     }
+
     function alertObjKeys(obj) {
         alert(Object.keys(obj).join('\n'))
     }
@@ -257,12 +262,13 @@
                 //曝光全局方法 给客户端调用
                 window.javaCallJsChangeStatus = this.changeState.bind(this);
                 window.downloadBtnClickCallBack = this.changeState.bind(this);
-                window.requestServerByAsyncCallBack = (type, status, json) => {};
+                window.requestServerByAsyncCallBack = (type, status, json) => {
+                };
                 window.loginSuccessCallBack = (res) => {
                     this.userInfo = this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo());
                 };
                 window.javaCallJsExitOutSwitch = () => {
-                    window.clearInterval(this.recordsTimer);
+                    this.recordsTimer && window.clearInterval(this.recordsTimer);
                     this.setCacheAppsAction(this.apps);
                     // 弹框未完成输入缓存, 未放弃领奖
                     if ((this.showDialogType === 'form-big' || this.showDialogType === 'form-sm') && !this.userInput.hasAbandon) {
@@ -305,7 +311,7 @@
         },
         methods: {
             fetchData() {
-                return fetchLotteryDetail({id : this.id}).then(res => {
+                return fetchLotteryDetail({id: this.id}).then(res => {
                     if (String(res.code) !== '0') {
                         return;
                     }
@@ -593,7 +599,7 @@
             },
             /*跳转详情*/
             jumpToDetail(app) {
-                JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
+                //JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
             },
             //下载所有
             handleDownloadAll() {
@@ -775,40 +781,39 @@
                     this.showDialog = false;
                     return;
                 }
-
                 //上传参数
                 if (this.showDialogType === 'form-sm' || this.showDialogType === 'form-big') {
                     //活动id
                     this.userInput.activityId = this.detail.id;
                     //用户输入检查
-                    if (!(this.$refs.name && this.$refs.name.valid)) {
+                    if (this.$refs.name && !this.$refs.name.valid) {
                         this.$refs.name.focus();
                         this.$refs.name.showErrorToast = true;
                         return;
                     }
-                    if (!(this.$refs.tel && this.$refs.tel.valid)) {
+                    if (this.$refs.tel && !this.$refs.tel.valid) {
                         this.$refs.tel.focus();
                         this.$refs.tel.showErrorToast = true;
                         return;
                     }
-                    if (!(this.$refs.qq && this.$refs.qq.valid)) {
+                    if (this.$refs.qq && !this.$refs.qq.valid) {
                         this.$refs.qq.focus();
                         this.$refs.qq.showErrorToast = true;
                         return;
                     }
-                    if (!(this.$refs.address && this.$refs.address.valid)) {
+                    if (this.$refs.address && !this.$refs.address.valid) {
                         this.$refs.address.focus();
                         this.$refs.address.showErrorToast = true;
                         return;
                     }
-                    if (this.$refs.name.currentValue === '') {
-                        this.$refs.name && this.$refs.name.focus();
-                    } else if (this.$refs.tel.currentValue === '') {
-                        this.$refs.tel && this.$refs.tel.focus();
-                    } else if (this.$refs.qq.currentValue === '') {
-                        this.$refs.qq && this.$refs.qq.focus();
-                    } else if (this.$refs.address.currentValue === '') {
-                        this.$refs.address && this.$refs.address.focus();
+                    if (this.$refs.name && this.$refs.name.currentValue === '') {
+                        this.$refs.name.focus();
+                    } else if (this.$refs.tel && this.$refs.tel.currentValue === '') {
+                        this.$refs.tel.focus();
+                    } else if (this.$refs.qq && this.$refs.qq.currentValue === '') {
+                        this.$refs.qq.focus();
+                    } else if (this.$refs.address && this.$refs.address.currentValue === '') {
+                        this.$refs.address.focus();
                     }
                     if (!this.userInfo.userId) {
                         this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo()) || {};
@@ -825,7 +830,6 @@
                         let paramsObj = pickBy(this.userInput, function (v) {
                             return !!v;
                         });
-//          let params = querystring.stringify(paramsObj);
                         let params = reduce(paramsObj, (result, v, k) => {
                             return `${result}&${k}=${v}`;
                         }, '');
@@ -850,18 +854,19 @@
                                 JsCallApp.alertAToast(resp.msg);
                                 this.setCacheUserInput();
                             }
-
                         } catch (e) {
                             this.$vux.loading.hide(); //提交出现异常：保持提交对话框
                             this.showDialog = true;
-                            JsCallApp.alertAToast('未正确填写');
+                            JsCallApp.alertAToast('提交出现异常');
                             this.setCacheUserInput();
                         }
                     } else {
                         this.showDialog = false;
+                        this.$vux.loading.hide();
                     }
                 } else {
                     this.showDialog = false;
+                    this.$vux.loading.hide();
                 }
             },
             closeDialog() {
@@ -1035,7 +1040,7 @@
             top: (950/@rem)*1rem;
             width: (340/@rem)*1rem;
             height: (109/@rem)*1rem;
-            left:(10/@rem)*-1rem;
+            left: (10/@rem)*-1rem;
             right: 0;
             margin: auto;
             background: transparent;
@@ -1158,8 +1163,8 @@
                 left: 33%;
                 top: 21%;
                 z-index: 1;
-                width: (81/@rem)*1rem;
-                height: (81/@rem)*1rem;
+                width: (82/@rem)*1rem;
+                height: (82/@rem)*1rem;
                 border-radius: 50%;
             }
         }
@@ -1196,6 +1201,7 @@
     .alert-list-item {
         list-style: none;
     }
+
     //--animation--
     .animated {
         animation-duration: 1s;
@@ -1211,6 +1217,7 @@
             transform: rotate(360deg)
         }
     }
+
     .rotate {
         animation-name: rotate
     }
@@ -1225,6 +1232,7 @@
             opacity: 1
         }
     }
+
     .zoomIn {
         animation-name: zoomIn
     }

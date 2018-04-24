@@ -269,6 +269,7 @@
         .process-bg {
             width: 100%;
             height: 100%;
+            background-color: transparent;
         }
         .process-bg-img {
             width: 100%;
