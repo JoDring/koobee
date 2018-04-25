@@ -90,12 +90,13 @@
         </div>
         <app-ad v-if="app" :app="app">
         </app-ad>
-        <div v-else-if="gameApp" class="gamecenter-ad" @click="openApps(gameApp)">
-            <img :src="gameApp.iconUrl" class="gamecenter-ad-icon">
-            <div style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
+        <div v-else-if="gameApp" class="gamecenter-ad">
+            <img @click="openApps(gameApp)" :src="gameApp.iconUrl" class="gamecenter-ad-icon">
+            <div @click="openApps(gameApp)" style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
             <btn class="app-info-btn"
                  @click.native="openGameCenter"
                  :app="gameApp"
+                 urlSchema="gamecenter://home?page=selected_page"
                  ref="appBtn"
                  style="width: 75px;
                         height: 30px;
@@ -268,14 +269,26 @@
                 })
             },
             updateBtn() {
-                this.$refs.appBtn.forEach((value) => {
-                    if (typeof value.changeState === 'function') {
-                        value.changeState()
-                    }
-                })
+                if(Array.isArray(this.$refs.appBtn)) {
+                    console.log('isArray: ' , this.$refs)
+                    this.$refs.appBtn.forEach((value) => {
+                        if (typeof value.changeState === 'function') {
+                            value.changeState()
+                        }
+                    })
+                } else if(this.$refs.appBtn) {
+                    console.log('isObject: ' , this.$refs)
+                    this.$refs.appBtn.changeState()
+                }
             },
             openGameCenter() {
-                window.open('gamecenter://home?page=selected_page')
+                /*const iframe = document.createElement('iframe')
+                iframe.src = 'gamecenter://home?page=selected_page'
+                iframe.style.display = none
+                document.body.appendChild(iframe)
+                setTimeout(function () {
+                    document.body.removeChild(iframe)
+                }, 1000)*/
             },
             openApps(app) {
                 window.jsObj && JsCallApp.handleAppAction(JSON.stringify(app), 'detail');

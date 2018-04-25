@@ -4,6 +4,7 @@
                   style="width: 75px; height: 30px;border-radius: 15px; font-size: 15px;"
                   @click="handleClick"
                   :url="app.downloadUrl"
+                  :urlSchema="urlSchema"
                   :mini="true"
                   :btn-text="btnState.btnText"
                   :percentage="btnState.percentage">
@@ -29,6 +30,9 @@
             app: {
                 type: Object,
                 required: true
+            },
+            urlSchema: {
+                type: String,
             }
         },
         mounted() {

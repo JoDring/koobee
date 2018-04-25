@@ -16,6 +16,7 @@
             url: {
                 required: true
             },
+            urlSchema: String,
             percentage: {
                 type: [Number, String],
                 default: 0
@@ -36,18 +37,30 @@
         methods: {
             handleClick(e, url) {
                 e.preventDefault()
-                let isWeixin = navigator.userAgent.match(/MicroMessenger/i);
-                if (isWeixin) {
-                    this.$vux.toast.show({
-                        text: '<div class="padding: 8px 14px">请点击右上角<br>选"在浏览器打开"</div>',
-                        width: '9em',
-                        type: 'text',
-                        position: 'top'
-                    })
-                    return
-                }
+                //不是自家客户端webview
                 if(!window.jsObj) {
+                    if(this.urlSchema) {
+                        const iframe = document.createElement('iframe')
+                        iframe.src = this.urlSchema
+                        iframe.style.display = 'none'
+                        document.body.appendChild(iframe)
+                        setTimeout(function () {
+                            document.body.removeChild(iframe)
+                        }, 1000)
+                        return
+                    }
                     if(window.navigator.onLine) {
+                        //is weixin?
+                        let isWeixin = navigator.userAgent.match(/MicroMessenger/i);
+                        if (isWeixin) {
+                            this.$vux.toast.show({
+                                text: '<div class="padding: 8px 14px">请点击右上角<br>选"在浏览器打开"</div>',
+                                width: '9em',
+                                type: 'text',
+                                position: 'top'
+                            })
+                            return
+                        }
                         //window.open(url);
                         location.href = url
                     } else {
