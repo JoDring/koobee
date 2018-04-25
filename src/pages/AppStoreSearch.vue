@@ -316,8 +316,8 @@
                         return
                     }
                     this.historySearchWords.unshift(word)
-                    if (this.historySearchWords.length > 8) {
-                        this.historySearchWords.length = 8
+                    if (this.historySearchWords.length > 4) {
+                        this.historySearchWords.length = 4
                     }
                     const words = JSON.stringify(this.historySearchWords)
                     window.localStorage.setItem('historySearchWordsFromAppStore', words)

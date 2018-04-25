@@ -9,8 +9,8 @@ Vue.use(VueScroller)
 import VueLazyload from 'vue-lazyload'
 Vue.use(VueLazyload, {
     preLoad: 1.3,
-    error: 'static/appStore/palceholder-logo.webp',
-    loading: 'static/appStore/palceholder-logo.webp',
+    error: 'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp',
+    loading: 'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/placeholder-appbg.webp',
     attempt: 1
 })
 import {LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';

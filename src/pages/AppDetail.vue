@@ -14,7 +14,7 @@
                 <section class="section-brief">
                     <div class="blur-img-c">
                         <x-img container=".view-body" class="blur-img"
-                               default-src="static/appStore/palceholder-logo.webp"
+                               default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
                                :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
@@ -23,13 +23,13 @@
                     </div>
                     <div class="logo-c">
                         <x-img container=".view-body" class="logo-big"
-                               default-src="static/appStore/palceholder-logo.webp"
+                               default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
                                :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl" width="180"
                                height="180">
                         </x-img>
                         <div class="inverted-logo-c">
                             <x-img container=".view-body" class="logo-big inverted"
-                                   default-src="static/appStore/palceholder-logo.webp"
+                                   default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
                                    :src="appList[0].largeIcon? appList[0].largeIcon:appList[0].iconUrl"
                                    width="180"
                                    height="180">
@@ -52,13 +52,13 @@
                 <section class="app-images">
                     <x-img v-for="item in imgList"
                            class="app-images-item"
-                           default-src="static/appStore/placeholder-appbg.webp"
+                           default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/placeholder-appbg.webp"
                            container=".app-images"
                            :src="item"
                            :key="item"
                            v-if="onLine">
                     </x-img>
-                    <img class="app-images-item" src="static/appStore/placeholder-appbg.webp" v-else>
+                    <img class="app-images-item" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/placeholder-appbg.webp" v-else>
                 </section>
                 <section class="app-desc-detail">
                     <h2>【应用介绍】</h2>
@@ -80,12 +80,12 @@
                                 <router-link
                                         :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
-                                        <x-img class="logo-sm" default-src="static/appStore/palceholder-logo.webp"
+                                        <x-img class="logo-sm" default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
                                                height="130" v-if="onLine">
                                         </x-img>
-                                        <img class="logo-sm" src="static/appStore/palceholder-logo.webp" v-else>
+                                        <img class="logo-sm" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                                     </div>
                                 </router-link>
                                 <h3>{{item.name}}</h3>
@@ -107,12 +107,12 @@
                                 <router-link
                                         :to="{name:'AppDetail', params: {appId: item.id, appName: item.name}, query: {isSub: true}}">
                                     <div class="logo-sm-c">
-                                        <x-img class="logo-sm" default-src="static/appStore/palceholder-logo.webp"
+                                        <x-img class="logo-sm" default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
                                                :src="item.largeIcon ? item.largeIcon : item.iconUrl"
                                                container=".view-body" width="130"
                                                height="130" v-if="onLine">
                                         </x-img>
-                                        <img class="logo-sm" src="static/appStore/palceholder-logo.webp" v-else>
+                                        <img class="logo-sm" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                                     </div>
                                 </router-link>
                                 <h3>{{item.name}}</h3>
