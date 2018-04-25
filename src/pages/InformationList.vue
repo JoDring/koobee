@@ -27,7 +27,11 @@
                 </div>
                 <div class="list-item" v-for="item in list" :key="item.id">
                     <div class="list-item-c" @click="goToDetail(item)">
-                        <div v-lazy:background-image="{src: item.imageUrl, loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"
+                        <div v-lazy:background-image="{
+                        src: item.imageUrl,
+                        error:'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/gamecenter-itembg.webp',
+                        loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+                        }"
                              class="list-item-img" v-if="onLine"></div>
                         <div class="list-item-img" style="background: #eee" v-else></div>
                         <div class="list-item-txt">
@@ -42,7 +46,7 @@
                         <div class="app-info-detail" @click="openApps(item.app)">
                             <div class="app-info-icon-c">
                                 <img class="app-info-icon" v-lazy="item.app.iconUrl" v-if="onLine">
-                                <img class="app-info-icon" src="static/images/palceholder-logo.png" v-else>
+                                <img class="app-info-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                             </div>
                             <div class="app-name-c">
                                 <div class="app-name">{{item.appName}}</div>

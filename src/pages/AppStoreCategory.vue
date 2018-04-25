@@ -32,7 +32,7 @@
                             :key="item.id">
                         <div class="list-item-img-c">
                             <img class="list-item-img" v-lazy="item.icon" v-if="onLine">
-                            <img class="list-item-img" src="../../static/appStore/palceholder-logo.webp">
+                            <img class="list-item-img" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp">
                         </div>
                         <span class="list-item-name">{{item.typeName}}</span>
                     </grid-item>

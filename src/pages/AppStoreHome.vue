@@ -41,7 +41,7 @@
                     <div class="list-item-c" @click="goToDetail(item)">
                         <div class="list-item-icon-c">
                             <img class="list-item-icon" v-lazy="item.iconUrl" v-if="onLine">
-                            <img class="list-item-icon" src="static/images/palceholder-logo.png" v-else>
+                            <img class="list-item-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                         </div>
                         <div>
                             <div class="list-item-name">{{item.name}}</div>

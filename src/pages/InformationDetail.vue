@@ -10,7 +10,10 @@
             </div>
             <div class="detail-information-list" v-if="sampleList && sampleList.length > 0">
                 <div class="list-item" v-for="item in sampleList" @click="goToDetail(item)">
-                    <div v-lazy:background-image="{src: item.imageUrl, loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"
+                    <div v-lazy:background-image="{
+                    src: item.imageUrl,
+                    error:'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/gamecenter-itembg.webp',
+                    loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}"
                          class="list-item-img" v-if="onLine"></div>
                     <div class="list-item-img" v-else></div>
                     <div class="list-item-txt">
