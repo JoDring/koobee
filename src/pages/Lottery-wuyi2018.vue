@@ -17,7 +17,7 @@
             </marquee>
             <button @click="handleDownloadAll"
                     class="weui-btn btn-download-all">
-                <span v-if="!userInfo || !userInfo.userId" class="btn-login"></span>
+                <span v-if="!(userInfo && userInfo.userId)" class="btn-login"></span>
             </button>
             <div class="app-list" v-if="apps.length > 0">
                 <div class="list-item" v-for="(item, index) in apps" :key="item.id">
@@ -297,9 +297,9 @@
                 }
                 //init page state
                 window.jsObj && this.changeState();
-                window.jsObj && (this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo()) || {});
                 window.MtaH5 && window.MtaH5.clickStat('loaded_activity_' + this.detail.id);
             });
+            window.jsObj && (this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo()) || {});
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
             })
@@ -1124,8 +1124,9 @@
             left: 0;
             right: 0;
             margin: auto;
-            background: url("../../static/images/lottery/wuyi2018/btn-login.webp") no-repeat;
+            background-image: url("../../static/images/lottery/wuyi2018/btn-login.webp");
             background-size: 100%;
+            background-repeat: no-repeat;
         }
         .lottery-rule {
             position: absolute;
