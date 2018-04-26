@@ -24,7 +24,7 @@
             <div class="hot-words" v-if="hotWords.length && showHotWords && !searchResult">
                 <div class="hot-word-title">热门搜索</div>
                 <div class="hot-word-item" v-for="item in hotWords" @click="handleHotWordClick(item)">
-                    {{item.searchWord}}
+                    <span class="hot-word-item-txt">{{item.searchWord}}</span>
                 </div>
             </div>
             <!--match列表-->
@@ -503,7 +503,7 @@
         }
         .hot-word-item {
             margin-bottom: 14px;
-            &:active {
+            .hot-word-item-txt:active {
                 background-color: #ddd;
             }
         }

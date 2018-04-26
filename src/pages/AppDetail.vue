@@ -1,8 +1,8 @@
 <template>
     <div class="view-container">
         <template v-if="appList.length > 0">
-            <div class="vux-header view-header" v-if="$route.query.isSub" @click="$router ? $router.back() : window.history.back()">
-                <div class="vux-header-left" >
+            <div class="vux-header view-header">
+                <div class="vux-header-left"  v-if="$route.query.isSub" @click="$router ? $router.back() : window.history.back()">
                     <a class="vux-header-back"></a>
                     <div class="left-arrow"></div>
                 </div>

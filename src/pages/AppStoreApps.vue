@@ -119,11 +119,11 @@
                 }
             },
             myTitle() {
-                if (this.apps[0]) {
-                    if (this.apps[0].categoryName) {
-                        return this.apps[0].categoryName
-                    } else {
+                if (this.apps[1]) {
+                    if (this.typeMap[this.type]) {
                         return this.typeMap[this.type]
+                    } else {
+                        return this.apps[1].categoryName
                     }
                 } else {
                     return ''

@@ -18,6 +18,7 @@
     "vue-lazyload": "^1.2.2",
     "vue-router": "^3.0.1",
     "vue-scroller": "^2.2.4",
+    "vue-scroller-fork": "git+https://github.com/JoDring/vue-scroller.git",
     "vux": "^2.7.3",
     "vux-loader": "^1.1.25"
   },

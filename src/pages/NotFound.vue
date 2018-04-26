@@ -19,14 +19,6 @@
         },
         created() {
             document.title = this.msg;
-        },
-        methods: {
-            handleClick() {
-                location.href = this.url
-            },
-            handleClick2() {
-                window.open(this.url)
-            }
         }
     }
 </script>
