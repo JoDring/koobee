@@ -43,7 +43,7 @@
                             <div class="list-match-item-brief">{{searchMatch.data.app.apkSize | formatSize(2)}}</div>
                         </div>
                     </router-link>
-                    <btn-download class="btn-download" :url="searchMatch.data.app.downloadUrl"
+                    <btn-download class="btn-download" :app="searchMatch.data.app" :url="searchMatch.data.app.downloadUrl"
                                   btnText="下载">
                     </btn-download>
                 </div>
@@ -94,7 +94,7 @@
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
                     </div>
-                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="安装"></btn-download>
+                    <btn-download class="btn-download" :app="item" :url="item.downloadUrl" btnText="安装"></btn-download>
                 </div>
             </scroller>
             <scroll-to-top v-if="$refs['scroller']"

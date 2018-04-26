@@ -32,6 +32,12 @@
             pause: {
                 type: Boolean,
                 default: false
+            },
+            app: {
+                type: Object,
+                default: () => {
+                    return {}
+                }
             }
         },
         methods: {
@@ -61,6 +67,12 @@
                             })
                             return
                         }
+                        window.MtaH5 && window.MtaH5.clickStat('appstore_h5_download_click', {
+                            'id': this.app.id,
+                            'name': this.app.name,
+                            'packagename': this.app.packageName,
+                            'client' : window.jsObj ? JsCallApp.getApplicationName() : 'webBrowser'
+                        });
                         //window.open(url);
                         location.href = url
                     } else {

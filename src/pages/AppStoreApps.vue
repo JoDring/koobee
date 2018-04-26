@@ -43,7 +43,7 @@
                             <div class="list-item-brief">{{item.brief}}</div>
                         </div>
                     </div>
-                    <btn-download class="btn-download" :url="item.downloadUrl" btnText="安装"></btn-download>
+                    <btn-download class="btn-download" :url="item.downloadUrl" :app="item" btnText="安装"></btn-download>
                 </div>
             </scroller>
             <scroll-to-top v-if="$refs['scroller']"

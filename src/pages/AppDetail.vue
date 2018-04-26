@@ -44,7 +44,7 @@
                         </p>
                     </div>
                     <div class="app-down-btn">
-                        <btn-download :url="appList[0].downloadUrl">
+                        <btn-download :url="appList[0].downloadUrl" :app="appList[0]">
                         </btn-download>
                     </div>
 
@@ -92,6 +92,7 @@
                                 <p>{{item.downloadTimes | timesFormat}}人使用</p>
                                 <div class="btn-c">
                                     <btn-download :url="item.downloadUrl"
+                                                  :app="item"
                                                   :mini="true">
                                     </btn-download>
                                 </div>
@@ -119,6 +120,7 @@
                                 <p>{{item.downloadTimes | timesFormat}}人使用</p>
                                 <div class="btn-c">
                                     <btn-download :url="item.downloadUrl"
+                                                  :app="item"
                                                   :mini="true">
                                     </btn-download>
                                 </div>
