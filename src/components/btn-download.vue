@@ -253,6 +253,7 @@
         padding: 0;
         background: url("../../static/images/lottery/wuyi2018/btn-bg.webp") no-repeat;
         background-size: cover;
+        left: (7/@rem)*1rem;
         &:active {
             border-color: transparent;
             &::after {
@@ -262,7 +263,7 @@
         }
         &.weui-btn_plain-primary {
             border: none;
-            background: #126530;
+            background: #fff1c7;
             overflow: hidden;
         }
         .process-bg {
@@ -277,7 +278,7 @@
             background-size: cover;
         }
         .process-text {
-            color: #fff1c7;
+            color: #d0121e;
         }
         &::after {
             border: none;

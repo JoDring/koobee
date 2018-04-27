@@ -375,6 +375,7 @@
                             this.apps.length = 12;
                         }
                     }
+                    this.loadFormBg = true
                 }, () => {
                     document.title = '网络出错了, 可尝试重进';
                 })
@@ -1046,9 +1047,10 @@
     .lottery {
         width: 100%;
         height: 100%;
-        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        transform: translate3d(0, 0, 0);
+        //transform: translate3d(0, 0, 0);
         .bg-img {
             display: block;
             margin: 0 auto;
@@ -1088,7 +1090,7 @@
         }
         .gamer-list {
             position: absolute;
-            top: (890/@rem)*1rem;
+            top: (880/@rem)*1rem;
             font-size: (24/@rem)*1rem;
             text-align: left;
             padding: 0 .4rem 0 1.4rem;
@@ -1243,7 +1245,8 @@
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-            margin-top: (30/@rem)*-1rem;;
+            margin-top: (30/@rem)*-1rem;
+            margin-left: (9/@rem)*1rem;
         }
     }
 
