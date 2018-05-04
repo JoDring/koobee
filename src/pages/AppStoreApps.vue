@@ -119,11 +119,11 @@
                 }
             },
             myTitle() {
-                if (this.apps[1]) {
+                if (this.apps.length) {
                     if (this.typeMap[this.type]) {
                         return this.typeMap[this.type]
                     } else {
-                        return this.apps[1].categoryName
+                        return this.title
                     }
                 } else {
                     return ''
@@ -441,7 +441,7 @@
                 position: relative;
             }
             .list-item-c {
-                height: 94px;
+                min-height: 94px;
                 display: flex;
                 align-items: center;
                 box-sizing: border-box;

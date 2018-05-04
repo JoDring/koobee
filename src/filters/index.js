@@ -1,5 +1,5 @@
 /* 数字 格式化*/
-export function formatSize(num, digits) {
+/*export function formatSize(num, digits) {
     const si = [
         { value: 1E18, symbol: 'E' },
         { value: 1E15, symbol: 'P' },
@@ -14,4 +14,29 @@ export function formatSize(num, digits) {
         }
     }
     return num.toString()
+}*/
+
+export function formatSize(val, digits = 2) {
+    let fm = '';
+    let u = 0;
+    while (u < 4 && val > 1024) {
+        u++;
+        val /= 1024;
+    }
+    let unit = 'Byte';
+    switch (u) {
+        case 1:
+            unit = 'KB';
+            break;
+        case 2:
+            unit = 'MB';
+            break;
+        case 3:
+            unit = 'GB';
+            break;
+        case 4:
+            unit = 'TB';
+    }
+    fm += val.toFixed(digits) + unit;
+    return fm;
 }

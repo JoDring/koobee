@@ -329,7 +329,7 @@
         }
         .list-item-c {
             width: 100%;
-            height: 94px;
+            min-height: 94px;
             padding: 0 13px;
             box-sizing: border-box;
             display: flex;

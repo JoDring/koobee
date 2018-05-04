@@ -310,7 +310,7 @@
         position: relative;
       }
       .list-item-c {
-        height: 94px;
+        min-height: 94px;
         display: flex;
         align-items: center;
         box-sizing: border-box;

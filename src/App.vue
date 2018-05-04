@@ -57,14 +57,17 @@
             padding: 0;
             background-color: #fff;
             height: 45px;
+            display: flex;
+            align-items: center;
             &:after {
                 .setBottomLine(#cacaca)
             }
         }
         .vux-header .vux-header-title {
             font-size: 16px;
-            height: 100%;
-            line-height: 45px;
+            height: auto;
+            line-height: 1.5;
+            flex: 1;
         }
         .vux-header .vux-header-right {
             height: 100%;
