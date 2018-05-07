@@ -2,6 +2,7 @@ import Router from 'vue-router';
 
 const NotFound = () => import('../pages/NotFound.vue');
 const H5Games = () => import('../components/H5Games.vue');
+const CheckAppInstalled = () => import('../pages/CheckAppInstalled.vue');  //检测应用是否安装
 
 const AppStoreHome = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreHome.vue');
 const AppDetail = () => import(/* webpackChunkName: "appStore" */ '../pages/AppDetail.vue');
@@ -66,6 +67,12 @@ export default new Router({
             path: '/H5Games/:id',
             name: 'H5Games',
             component: H5Games,
+            props: true
+        },
+        {
+            path: '/CheckAppInstalled/:urlSchema/:url',
+            name: 'CheckAppInstalled',
+            component: CheckAppInstalled,
             props: true
         },
         {

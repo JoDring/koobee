@@ -45,7 +45,7 @@
                     <div class="app-info" v-if="item.app">
                         <div class="app-info-detail" @click="openApps(item.app)">
                             <div class="app-info-icon-c">
-                                <img class="app-info-icon" v-lazy="item.app.iconUrl" v-if="onLine">
+                                <img class="app-info-icon" v-lazy="item.app.largeIcon ? item.app.largeIcon : item.app.iconUrl" v-if="onLine">
                                 <img class="app-info-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                             </div>
                             <div class="app-name-c">
@@ -94,19 +94,10 @@
         </div>
         <app-ad v-if="app" :app="app">
         </app-ad>
-        <div v-else-if="gameApp" class="gamecenter-ad">
-            <img @click="openApps(gameApp)" :src="gameApp.iconUrl" class="gamecenter-ad-icon">
-            <div @click="openApps(gameApp)" style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
-            <btn class="app-info-btn"
-                 @click.native="openGameCenter"
-                 :app="gameApp"
-                 urlSchema="gamecenter://home?page=selected_page"
-                 ref="appBtn"
-                 style="width: 75px;
-                        height: 30px;
-                        border-radius: 15px;
-                        font-size: 15px;">
-            </btn>
+        <div v-else-if="gameApp && client === 'webBrowser'" class="gamecenter-ad">
+            <img :src="gameApp.largeIcon? gameApp.largeIcon : gameApp.iconUrl" class="gamecenter-ad-icon">
+            <div style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
+            <div class="gamecenter-download-btn" @click="openGameCenter">打开</div>
         </div>
     </div>
 </template>
@@ -135,6 +126,8 @@
                 onLine: window.navigator.onLine,
                 scrollPosition: {x: 0, y: 0, animate: false},
                 showScrollerMask: false,
+                client: window.jsObj ? JsCallApp.getApplicationName() : 'webBrowser',
+                urlSchema: 'gamecenter://home?page=selected_page'
             }
         },
         props: {
@@ -274,25 +267,24 @@
             },
             updateBtn() {
                 if(Array.isArray(this.$refs.appBtn)) {
-                    console.log('isArray: ' , this.$refs)
                     this.$refs.appBtn.forEach((value) => {
                         if (typeof value.changeState === 'function') {
                             value.changeState()
                         }
                     })
                 } else if(this.$refs.appBtn) {
-                    console.log('isObject: ' , this.$refs)
                     this.$refs.appBtn.changeState()
                 }
             },
             openGameCenter() {
-                /*const iframe = document.createElement('iframe')
-                iframe.src = 'gamecenter://home?page=selected_page'
-                iframe.style.display = none
-                document.body.appendChild(iframe)
-                setTimeout(function () {
-                    document.body.removeChild(iframe)
-                }, 1000)*/
+                this.$router.push({
+                    name:'CheckAppInstalled',
+                    append: false,
+                    params: {
+                        urlSchema: this.urlSchema,
+                        url: this.gameApp ? this.gameApp.downloadUrl : 'empty'
+                    }
+                })
             },
             openApps(app) {
                 window.jsObj && JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
@@ -318,6 +310,7 @@
     @gray-dark: #5d5d5d;
     @gray-light: #a1a1a1;
     @bg-gray: #e5e5e5;
+    @orange : #ff6c3a;
     .information-list {
         height: 100%;
         font-size: 13px;
@@ -347,11 +340,12 @@
                 background-position: center;
             }
             .regions-item-btn {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 background: #ff6b3b;
                 color: #fff;
                 text-align: center;
-                line-height: 25px;
                 font-size: 12px;
                 border-radius: 25px;
                 width: 55px;
@@ -368,7 +362,7 @@
         }
         .list-detail {
             .list-item-c {
-                height: 90px;
+                min-height: 90px;
                 display: flex;
                 box-sizing: border-box;
                 background: #fff;
@@ -394,7 +388,7 @@
             }
             .list-item-txt {
                 flex: 1;
-                height: 65px;
+                min-height: 65px;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -515,6 +509,18 @@
             width: 38px;
             height: 38px;
             margin-right: 9px;
+        }
+        .gamecenter-download-btn {
+            width: 75px;
+            height: 30px;
+            border-radius: 15px;
+            font-size: 15px;
+            background: @orange;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
         }
     }
 </style>

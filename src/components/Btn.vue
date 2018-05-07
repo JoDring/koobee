@@ -21,7 +21,7 @@
                 btnState: {
                     percentage: 0,
                     pause: false,
-                    btnText: '安装'
+                    btnText: this.btnText || '安装'
                 },
                 client: window.jsObj ? JsCallApp.getApplicationName() : 'webBrowser'  //客户端名称
             }
@@ -32,8 +32,11 @@
                 required: true
             },
             urlSchema: {
-                type: String,
-            }
+                type: String
+            },
+            btnText: {
+                type: String
+            },
         },
         mounted() {
             /*window.javaCallJsChangeStatus = this.changeState.bind(this);

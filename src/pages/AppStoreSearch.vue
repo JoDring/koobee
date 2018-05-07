@@ -85,7 +85,7 @@
                 <div class="list-item" v-for="item in searchResult.apps" :key="item.id">
                     <div @click="goToDetail(item)" class="list-item-c">
                         <div class="list-item-icon-c">
-                            <img class="list-item-icon" v-lazy="item.iconUrl" v-if="onLine">
+                            <img class="list-item-icon" v-lazy="item.largeIcon ? item.largeIcon : item.iconUrl" v-if="onLine">
                             <img class="list-item-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                         </div>
                         <div>

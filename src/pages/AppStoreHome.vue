@@ -33,14 +33,14 @@
                     v-if="apps.length">
                 <grid class="category" v-if="navBars.length">
                     <grid-item v-for="item in navBars" :key="item.id">
-                        <router-link :to="categoryMap[item.type]" slot="icon"><img v-lazy="item.iconUrl"></router-link>
+                        <router-link :to="categoryMap[item.type]" slot="icon"><img v-lazy="item.largeIcon ? item.largeIcon : item.iconUrl"></router-link>
                         <router-link tag="span" :to="categoryMap[item.type]" class="category-title" slot="label">{{ item.title }}</router-link>
                     </grid-item>
                 </grid>
                 <div class="list-item" v-for="item in apps" :key="item.id">
                     <div class="list-item-c" @click="goToDetail(item)">
                         <div class="list-item-icon-c">
-                            <img class="list-item-icon" v-lazy="item.iconUrl" v-if="onLine">
+                            <img class="list-item-icon" v-lazy="item.largeIcon ? item.largeIcon : item.iconUrl" v-if="onLine">
                             <img class="list-item-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
                         </div>
                         <div>

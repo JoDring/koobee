@@ -2,7 +2,7 @@
     <!--底部app广告下载-->
     <div class="information-app-ad" v-if="app">
         <div class="app-info-brief" @click="goToDetail">
-            <img :src="app.iconUrl" class="app-info-icon">
+            <img :src="app.largeIcon ? app.largeIcon : app.iconUrl" class="app-info-icon">
             <div class="brief-txt">
                 <span>{{app.name}}</span>
                 <span class="txt-gray">{{app.apkSize | formatSize(2)}}</span>

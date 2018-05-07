@@ -298,7 +298,7 @@
             .list-item {
                 display: flex;
                 align-items: center;
-                height: 94px;
+                min-height: 94px;
                 padding: 0 12px;
                 box-sizing: border-box;
                 position: relative;
@@ -323,7 +323,7 @@
                 background-position: center;
             }
             .list-item-txt {
-                height: 65px;
+                min-height: 65px;
                 flex: 1;
                 display: flex;
                 flex-direction: column;
@@ -347,9 +347,10 @@
                 font-size: 15px;
                 color: #fff;
                 text-align: center;
-                line-height: 35px;
                 border-radius: 35px;
-                display: block;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 margin: 10px auto;
             }
         }
