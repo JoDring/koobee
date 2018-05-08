@@ -217,7 +217,7 @@
 <style lang="less">
     @import "~vux/src/styles/weui/base/fn.less";
 
-    @black: #000;
+    @black: #222;
     @gray-dark: #5d5d5d;
     @gray-light: #a1a1a1;
     @bg-gray: #e5e5e5;
@@ -331,14 +331,14 @@
             }
             .item-title {
                 font-size: 15px;
-                color: #222;
+                color: @black;
                 .ellipsisLn(2)
             }
             .item-time {
                 display: flex;
                 justify-content: space-between;
                 font-size: 11px;
-                color: #a1a1a1;
+                color: @gray-dark;
             }
             .list-bottom-btn {
                 width: 90px;

@@ -306,7 +306,7 @@
 <style lang="less">
     @import "~vux/src/styles/weui/base/fn.less";
 
-    @black: #000;
+    @black: #222;
     @gray-dark: #5d5d5d;
     @gray-light: #a1a1a1;
     @bg-gray: #e5e5e5;
@@ -362,11 +362,11 @@
         }
         .list-detail {
             .list-item-c {
-                min-height: 90px;
+                min-height: 96px;
                 display: flex;
                 box-sizing: border-box;
                 background: #fff;
-                padding: 15px 13px 10px;
+                padding: 18px 13px 10px;
                 position: relative;
                 z-index: 2;
                 text-align: justify;
@@ -402,7 +402,7 @@
             }
             .list-item-brief {
                 font-size: 11px;
-                color: @gray-light;
+                color: @gray-dark;
                 display: flex;
                 justify-content: space-between;
             }
@@ -419,7 +419,7 @@
             .app-info {
                 display: flex;
                 width: 100%;
-                height: 42px;
+                height: 45px;
                 justify-content: space-between;
                 padding: 0 13px;
                 box-sizing: border-box;
@@ -467,6 +467,7 @@
                     height: 15px;
                     white-space: nowrap;
                     position: relative;
+                    margin-top: -2px;
                 }
                 .app-info-btn {
                     flex-shrink: 1;

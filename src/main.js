@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Router from 'vue-router';
-import VueScroller from 'vue-scroller-fork'
+import VueScroller from 'vue-scroller-jodring'
 Vue.use(VueScroller)
 import VueLazyload from 'vue-lazyload'
 Vue.use(VueLazyload, {
