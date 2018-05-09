@@ -123,7 +123,7 @@
                     pageSize: 10
                 },
                 failLoaded: false,
-                onLine: window.navigator.onLine,
+                onLine: /prize_broser/g.test(navigator.userAgent) ? true : window.navigator.onLine,
                 scrollPosition: {x: 0, y: 0, animate: false},
                 showScrollerMask: false,
                 client: window.jsObj ? JsCallApp.getApplicationName() : 'webBrowser',

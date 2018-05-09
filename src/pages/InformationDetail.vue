@@ -49,7 +49,7 @@
                 list: [],
                 app: null,
                 failLoaded: false,
-                onLine: window.navigator.onLine
+                onLine: /prize_broser/g.test(navigator.userAgent) ? true : window.navigator.onLine
             }
         },
         props: {
@@ -282,7 +282,7 @@
                     display: block;
                     text-align: left;
                     margin-top: 5px;
-                    font-size: 15px;
+                    font-size: 13px;
                     color: #a1a1a1;
                 }
             }

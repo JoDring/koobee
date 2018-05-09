@@ -79,7 +79,7 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                onLine: window.navigator.onLine,
+                onLine: /prize_broser/g.test(navigator.userAgent) ? true : window.navigator.onLine,
                 scrollPosition: {x: 0, y: 0, animate: false},
                 showScrollerMask: false,
                 typeMap: {

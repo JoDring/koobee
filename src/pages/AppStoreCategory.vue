@@ -60,7 +60,7 @@
             return {
                 list: null,
                 hotWords: null,
-                onLine: window.navigator.onLine,
+                onLine: /prize_broser/g.test(navigator.userAgent) ? true : window.navigator.onLine,
                 loading: false,
                 failLoaded: false
             }

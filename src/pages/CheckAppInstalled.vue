@@ -35,6 +35,16 @@
                 }, 1000)
             },
             downloadApp() {
+                let isWeixin = navigator.userAgent.match(/MicroMessenger/i);
+                if (isWeixin) {
+                    this.$vux.toast.show({
+                        text: '<div class="padding: 8px 14px">请点击右上角<br>选"在浏览器打开"</div>',
+                        width: '9em',
+                        type: 'text',
+                        position: 'top'
+                    })
+                    return
+                }
                 location.href = this.url
             }
         }

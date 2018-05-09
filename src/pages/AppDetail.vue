@@ -184,7 +184,7 @@
                 loading: false,
                 failLoaded: false,
                 appList: [], //第一个是 需要详情的App
-                onLine: window.navigator.onLine
+                onLine: /prize_broser/g.test(navigator.userAgent) ? true : window.navigator.onLine
             }
         },
         computed: {
