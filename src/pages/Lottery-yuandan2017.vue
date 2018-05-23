@@ -700,7 +700,7 @@
                             btnText: JsCallApp.isSystemAppstore() ? '安装' : '下载'
                         }
                     }
-                } else if (payload.appStatus == appState.FINAL_PAUSE) { //暂停
+                } else if ((payload.appStatus == appState.FINAL_PAUSE) || (payload.appStatus == appState.FINAL_PAUSE2)) { //暂停
                     return {
                         ...state,
                         action: 'continue',

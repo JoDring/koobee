@@ -287,6 +287,7 @@ const FINAL_DOWNLOAD = 4096;  //下载
 const FINAL_UPDATE = 4101;  //更新 - 应用需要更新
 const FINAL_OPEN = 4100;	//打开 - 应用已经被安装
 const FINAL_PAUSE = 4098;  //暂停 - 应用被暂停
+const FINAL_PAUSE2 = 4108;  //暂停 - 应用被暂停
 const FINAL_INSTALL = 4099; //安装 - 应用完成下载但未安装
 const FINAL_INSTALL_ING = 4103; //安装中
 const FINAL_DOWNLOAD_ING = 4097;  //下载
@@ -295,7 +296,7 @@ export const appState = {
   FINAL_DOWNLOAD,
   FINAL_UPDATE,
   FINAL_OPEN,
-  FINAL_PAUSE,
+  FINAL_PAUSE, FINAL_PAUSE2,
   FINAL_INSTALL,
   FINAL_INSTALL_ING,
   FINAL_DOWNLOAD_ING,

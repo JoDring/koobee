@@ -180,7 +180,6 @@
 //    querystring,
         TransferDomDirective as TransferDom
     } from 'vux';
-    import random from 'lodash/random';
     import reduce from 'lodash/reduce';
     import pickBy from 'lodash/pickBy';
     import isEqual from 'lodash/isEqual';
@@ -657,7 +656,7 @@
             },
             /*跳转详情*/
             jumpToDetail(app) {
-                //JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
+                JsCallApp.handleAppAction(JSON.stringify(app), 'detail');
             },
             //下载所有
             handleDownloadAll() {
@@ -746,7 +745,7 @@
                             btnText: JsCallApp.isSystemAppstore() ? '安装' : '下载'
                         }
                     }
-                } else if (payload.appStatus == appState.FINAL_PAUSE) { //暂停
+                } else if ((payload.appStatus == appState.FINAL_PAUSE) || (payload.appStatus == appState.FINAL_PAUSE2)) { //暂停
                     return {
                         ...state,
                         action: 'continue',
