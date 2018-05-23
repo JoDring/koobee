@@ -4,7 +4,7 @@ const service = axios.create({
     baseURL: location.origin === 'http://192.168.1.192:8080' ? 'http://192.168.1.148:8090' : location.origin,
     timeout: 8000, // request timeout
     transformRequest: [(data) => {
-        const  formData = new FormData()
+        const formData = new FormData()
         for(const item in data) {
             if(data.hasOwnProperty(item)) {
                 formData.append(item, data[item])

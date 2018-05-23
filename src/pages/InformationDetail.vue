@@ -30,6 +30,12 @@
             </div>
         </main>
         <app-ad v-if="app" :app="app"></app-ad>
+        <div v-if="loading" style="width: 100%; height: 100%;display: flex;justify-content: center; align-items: center">
+            <div style="text-align: center; font-size: 13px; color: #ccc">
+                <img src="http://360.cooseatech.cn/appstore/H5/gamecenter/static/images/spinner480.gif" width="45">
+                <div style="margin-top: 5px">正在卖力加载中...</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -118,11 +124,9 @@
             getInformationDetail(id) {
                 const appId = id ? id : this.id
                 this.loading = true;
-                this.$vux.loading.show();
                 return fetchInformationDetail({id: appId}).then(res => {
                     this.loading = false;
                     document.title = this.title
-                    this.$vux.loading.hide();
                     if (res.code === '0') {
                         this.detail = res.data.detail
                         this.app = res.data.detail.app;
@@ -155,7 +159,6 @@
 
                 }, () => {
                     this.loading = false;
-                    this.$vux.loading.hide();
                     this.failLoaded = true;
                     this.$vux.toast.text('加载超时', 'bottom')
                 })

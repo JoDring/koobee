@@ -394,11 +394,11 @@
                 justify-content: space-between;
             }
             .list-item-name {
-                margin-top: 2px;
-                font-size: 14px;
-                line-height: 1.4;
+                margin-top: 1px;
+                font-size: 15px;
+                line-height: 1.3;
                 color: @black;
-                .ellipsisLn(2)
+                .ellipsisLn(2);
             }
             .list-item-brief {
                 font-size: 11px;
@@ -450,7 +450,7 @@
                     white-space: nowrap;
                     max-width: 180px;
                     overflow: hidden;
-                    font-size: 15px;
+                    font-size: 14px;
                     text-overflow: ellipsis;
                     margin:0 10px;
                     color: #222222;
@@ -459,8 +459,8 @@
                     line-height: 14px;
                     text-align: center;
                     font-size: 10px;
-                    color: #02c5aa;
-                    border: 1px solid #02c5aa;
+                    color: #ff9e2b;
+                    border: 1px solid #ff9e2b;
                     border-radius: 2px;
                     box-sizing: border-box;
                     width: 27px;
