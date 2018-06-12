@@ -1,7 +1,7 @@
 import axios from 'axios'
 const service = axios.create({
     // baseURL:process.env.BASE_API,
-    baseURL: location.origin === 'http://192.168.1.192:8080' ? 'http://192.168.1.148:8090' : location.origin,
+    baseURL: window.location.origin,
     timeout: 8000, // request timeout
     transformRequest: [(data) => {
         const formData = new FormData()

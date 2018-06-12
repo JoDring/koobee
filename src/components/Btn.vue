@@ -5,6 +5,7 @@
                   @click="handleClick"
                   :url="app.downloadUrl"
                   :urlSchema="urlSchema"
+                  :app="app"
                   :mini="true"
                   :btn-text="btnState.btnText"
                   :percentage="btnState.percentage">
@@ -37,11 +38,16 @@
             btnText: {
                 type: String
             },
+            update: {
+                type: Boolean,
+                default: true
+            }
         },
         mounted() {
             /*window.javaCallJsChangeStatus = this.changeState.bind(this);
             window.downloadBtnClickCallBack = this.changeState.bind(this);*/
-            window.requestServerByAsyncCallBack = (type, status, json) => {};
+            window.requestServerByAsyncCallBack = (type, status, json) => {
+            };
             window.jsObj && this.changeState();
         },
         watch: {
@@ -58,7 +64,7 @@
                         btnText: '打开',
                         action: 'open'
                     })
-                } else if (payload.appStatus == appState.FINAL_UPDATE) { //更新
+                } else if ((payload.appStatus == appState.FINAL_UPDATE) && this.update) { //更新
                     return Object.assign({}, state, {
                         btnText: '更新',
                         action: 'update'
@@ -68,7 +74,7 @@
                         'id': this.app.id,
                         'name': this.app.name,
                         'packagename': this.app.packageName,
-                        'client' : this.client
+                        'client': this.client
                     });
                     return Object.assign({}, state, {
                         percentage: 0,
@@ -118,7 +124,7 @@
                 });
             },
             handleClick() {
-                if(window.jsObj) {
+                if (window.jsObj) {
                     JsCallApp.handleAppAction(JSON.stringify(this.app), this.btnState.action);
                 }
             }

@@ -203,7 +203,6 @@ const JsCallApp = (function(){
 	*/
 	function getApplicationName(){
 		if(!window.jsObj || !window.jsObj.jsCallGetApplicationName){
-			//showUpdateAppstoreNotice();
 			return null
 		}
 		return window.jsObj.jsCallGetApplicationName();

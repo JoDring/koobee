@@ -32,7 +32,7 @@
                     :on-infinite="getMore"
                     v-if="apps.length">
                 <grid class="category" v-if="navBars.length">
-                    <grid-item v-for="item in navBars" :key="item.id">
+                    <grid-item v-for="item in navBars" :key="item.id" @click.native="goToTypePage(item.type)">
                         <router-link :to="categoryMap[item.type]" slot="icon"><img v-lazy="item.largeIcon ? item.largeIcon : item.iconUrl"></router-link>
                         <router-link tag="span" :to="categoryMap[item.type]" class="category-title" slot="label">{{ item.title }}</router-link>
                     </grid-item>
@@ -58,7 +58,7 @@
                            :scroller="$refs['scroller']">
             </scroll-to-top>
         </div>
-        <div slot="bottom" class="footer" v-show="showFooter">
+        <!--<div slot="bottom" class="footer" v-show="showFooter">
             <img class="footer-app-icon" src="../assets/appStore/app-store-icon.webp">
             <div>
                 <div class="footer-title">应用市场</div>
@@ -71,7 +71,7 @@
             <div class="icon-close-c" @click="showFooter = false">
                 <x-icon class="icon-close" type="ios-close-empty" size="22"></x-icon>
             </div>
-        </div>
+        </div>-->
         <refresh-tip v-if="!loading && failLoaded && apps.length === 0" @click.native="getHomeData"></refresh-tip>
         <!--loading spinner-->
         <div v-if="loading && showSpinner"
@@ -118,6 +118,8 @@
         created() {
             this.getHomeData().then(() => {
                 this.getHotWords()
+                //友盟统计
+                _czc.push(["_trackPageview", "/appstore/H5/storehome/#/appstoreHome"]);
                 /*this.$vux.confirm.show({
                     content: '是否需要打开 应用市场app',
                     maskTransition:'none',
@@ -235,6 +237,12 @@
                     searchWord = this.hotWords[this.$refs['hotWords'].currentIndex].searchWord
                 }
                 this.$router.push({name: 'AppStoreSearch', append: false, params: {hotWord: searchWord || '游戏'}})
+                //友盟统计
+                _czc.push(['_trackEvent', '搜索', '点击'])
+            },
+            goToTypePage(typeName) {
+                //友盟统计
+                _czc.push(['_trackEvent', '分类导航', typeName])
             },
             goToDetail(app) {
                 this.$router.push({name: 'AppDetail', append: false, params: {appId: app.id, appName: app.name}, query: {isSub: true}})

@@ -73,6 +73,8 @@
                             'packagename': this.app.packageName,
                             'client' : window.jsObj ? JsCallApp.getApplicationName() : 'webBrowser'
                         });
+                        //友盟统计
+                        _czc.push(['_trackEvent', '下载app', this.app.name])
                         //window.open(url);
                         location.href = url
                     } else {

@@ -45,8 +45,11 @@
                     <div class="app-info" v-if="item.app">
                         <div class="app-info-detail" @click="openApps(item.app)">
                             <div class="app-info-icon-c">
-                                <img class="app-info-icon" v-lazy="item.app.largeIcon ? item.app.largeIcon : item.app.iconUrl" v-if="onLine">
-                                <img class="app-info-icon" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp" v-else>
+                                <img class="app-info-icon"
+                                     v-lazy="item.app.largeIcon ? item.app.largeIcon : item.app.iconUrl" v-if="onLine">
+                                <img class="app-info-icon"
+                                     src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
+                                     v-else>
                             </div>
                             <div class="app-name-c">
                                 <div class="app-name">{{item.appName}}</div>
@@ -94,10 +97,15 @@
         </div>
         <app-ad v-if="app" :app="app">
         </app-ad>
-        <div v-else-if="gameApp && client === 'webBrowser'" class="gamecenter-ad">
+        <div v-else-if="gameApp && client !== 'gamecenter'" class="gamecenter-ad">
             <img :src="gameApp.largeIcon? gameApp.largeIcon : gameApp.iconUrl" class="gamecenter-ad-icon">
             <div style="flex: 1">更多精彩游戏就在{{gameApp.name}}!</div>
-            <div class="gamecenter-download-btn" @click="openGameCenter">打开</div>
+            <div v-if="client === 'webBrowser'" class="gamecenter-download-btn" @click="openGameCenter">打开</div>
+            <btn v-else class="gamecenter-download-btn"
+                 :app="gameApp"
+                 :update="false"
+                 ref="appBtn">
+            </btn>
         </div>
     </div>
 </template>
@@ -266,19 +274,19 @@
                 })
             },
             updateBtn() {
-                if(Array.isArray(this.$refs.appBtn)) {
+                if (Array.isArray(this.$refs.appBtn)) {
                     this.$refs.appBtn.forEach((value) => {
                         if (typeof value.changeState === 'function') {
                             value.changeState()
                         }
                     })
-                } else if(this.$refs.appBtn) {
+                } else if (this.$refs.appBtn) {
                     this.$refs.appBtn.changeState()
                 }
             },
             openGameCenter() {
                 this.$router.push({
-                    name:'CheckAppInstalled',
+                    name: 'CheckAppInstalled',
                     append: false,
                     params: {
                         urlSchema: this.urlSchema,
@@ -310,7 +318,7 @@
     @gray-dark: #5d5d5d;
     @gray-light: #a1a1a1;
     @bg-gray: #e5e5e5;
-    @orange : #ff6c3a;
+    @orange: #ff6c3a;
     .information-list {
         height: 100%;
         font-size: 13px;
@@ -441,7 +449,7 @@
                 .app-info-icon {
                     width: 100%;
                 }
-                .app-name-c{
+                .app-name-c {
                     height: 27px;
                     display: flex;
                     align-items: center;
@@ -452,7 +460,7 @@
                     overflow: hidden;
                     font-size: 14px;
                     text-overflow: ellipsis;
-                    margin:0 10px;
+                    margin: 0 10px;
                     color: #222222;
                 }
                 .tag {
@@ -482,7 +490,7 @@
             left: 0;
             width: 100%;
             height: 62px;
-            background-color: rgba(255,255,255,.94);
+            background-color: rgba(255, 255, 255, .94);
             color: #2b2b2b;
             display: flex;
             align-items: center;
