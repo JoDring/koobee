@@ -44,13 +44,19 @@
         mounted() {
             window.javaCallJsChangeStatus = this.changeState.bind(this);
             window.downloadBtnClickCallBack = this.changeState.bind(this);
-            window.requestServerByAsyncCallBack = (type, status, json) => {};
+            window.requestServerByAsyncCallBack = (type, status, json) => {
+            };
             window.jsObj && this.changeState();
         },
         watch: {
             'app': function () {
                 window.jsObj && this.changeState();
             }
+        },
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                console.log(vm, 'app-ad')
+            })
         },
         methods: {
             goToDetail() {
@@ -60,7 +66,7 @@
                         'id': this.app.id,
                         'name': this.app.name,
                         'packagename': this.app.packageName,
-                        'client' : this.client
+                        'client': this.client
                     });
                 } else {
                     this.$router.push({name: 'AppDetail', params: {appId: this.app.id}, query: {isSub: true}})
@@ -84,7 +90,7 @@
                         'id': this.app.id,
                         'name': this.app.name,
                         'packagename': this.app.packageName,
-                        'client' : this.client
+                        'client': this.client
                     });
                     return Object.assign({}, state, {
                         percentage: 0,
@@ -134,7 +140,7 @@
                 });
             },
             handleClick() {
-                if(window.jsObj) {
+                if (window.jsObj) {
                     JsCallApp.handleAppAction(JSON.stringify(this.app), this.btnState.action);
                 }
             }

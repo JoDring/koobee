@@ -118,8 +118,6 @@
         created() {
             this.getHomeData().then(() => {
                 this.getHotWords()
-                //友盟统计
-                _czc.push(["_trackPageview", "/appstore/H5/storehome/#/appstoreHome"]);
                 /*this.$vux.confirm.show({
                     content: '是否需要打开 应用市场app',
                     maskTransition:'none',

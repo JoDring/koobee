@@ -50,12 +50,12 @@
 
                 </section>
                 <section class="app-images">
-                    <x-img v-for="item in imgList"
+                    <x-img v-for="(item, index) in imgList"
                            class="app-images-item"
                            default-src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/placeholder-appbg.webp"
                            container=".app-images"
                            :src="item"
-                           :key="item"
+                           :key="index"
                            v-if="onLine">
                     </x-img>
                     <img class="app-images-item" src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/placeholder-appbg.webp" v-else>

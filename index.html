@@ -89,6 +89,15 @@
             color: #fff;
         }
     </style>
+    <script>
+        //app可能需要
+        window.javaCallJsChangeStatus =  function () {
+            console.log(new Date(), 'javaCallJsChangeStatus()')
+        };
+        window.javaCallJsExitOutSwitch =  function () {
+            console.log(new Date(), 'javaCallJsExitOutSwitch()')
+        };
+    </script>
 </head>
 <body>
 <div id="app">
@@ -100,15 +109,15 @@
 </div>
 <%=htmlWebpackPlugin.files.webpackManifest%>
 <script>
-    //app可能需要
-    window.javaCallJsChangeStatus = function () {
-    };
-    window.javaCallJsExitOutSwitch = function () {
-    };
+    // 友盟统计-第三方js
+    var _czc = _czc || [];
+    _czc.push(['_setAccount', '1273933004']);
+    // _czc.push(['_setAccount', '1273931072']); //test
+    // 腾讯统计-第三方js
+
     var _mtac = {"performanceMonitor": 1};
     (function () {
         var s = document.getElementsByTagName("script")[0];
-        // 腾讯统计-第三方js
         var mta = document.createElement("script");
         mta.src = "http://pingjs.qq.com/h5/stats.js?v2.0.4";
         mta.setAttribute("name", "MTAH5");
@@ -116,16 +125,7 @@
         mta.setAttribute("sid", "500397080");
         mta.setAttribute("cid", "500397118");
         s.parentNode.insertBefore(mta, s);
-        // 友盟统计-第三方js
-        /* var cnzzScript = document.createElement("script");
-        cnzzScript.src = "https://s22.cnzz.com/z_stat.php?id=1273931072&web_id=1273931072";
-        cnzzScript.setAttribute("async", true);
-        cnzzScript.setAttribute("type", 'text/script');
-        cnzzScript.setAttribute("charset", 'utf-8');
-        s.parentNode.insertBefore(cnzzScript, s);*/
-        var _czc = _czc || [];
-        _czc.push(['_setAccount', '1273933004']);
-        // _czc.push(['_setAccount', '1273931072']);
+
 
         //断网提示
         var indexSpinner = document.getElementById('index-spinner');
@@ -151,6 +151,6 @@
 </script>
 <!--友盟统计-第三方js-->
 <script src="https://s13.cnzz.com/z_stat.php?id=1273933004&web_id=1273933004" async type="text/javascript"></script>
-<!--<script src="https://s13.cnzz.com/z_stat.php?id=1273931072&web_id=1273931072" async type="text/javascript"></script>-->
+<!--<script src="https://s13.cnzz.com/z_stat.php?id=1273931072&web_id=1273931072" type="text/javascript"></script>-->
 </body>
 </html>

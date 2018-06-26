@@ -183,6 +183,8 @@
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {
+                window.javaCallJsChangeStatus = vm.updateBtn.bind(vm);
+                window.downloadBtnClickCallBack = vm.updateBtn.bind(vm);
                 document.title = vm.title
                 setTimeout(function () {
                     if (vm.resetScroller) {

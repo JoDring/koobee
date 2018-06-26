@@ -5,8 +5,10 @@ import App from './App.vue'
 import router from './router'
 import Router from 'vue-router';
 import VueScroller from 'vue-scroller-jodring'
+
 Vue.use(VueScroller)
 import VueLazyload from 'vue-lazyload'
+
 Vue.use(VueLazyload, {
     preLoad: 1.3,
     error: 'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp',
@@ -14,6 +16,7 @@ Vue.use(VueLazyload, {
     attempt: 1
 })
 import {LoadingPlugin, ToastPlugin, ConfirmPlugin, ConfigPlugin, AlertPlugin, BusPlugin} from 'vux';
+
 Vue.use(ConfigPlugin, {
     $layout: 'VIEW_BOX'
 });
@@ -26,11 +29,16 @@ Vue.use(BusPlugin);
 /*const FastClick = require('fastclick')
 FastClick.attach(document.body)*/
 Vue.config.productionTip = false;
-/*router.beforeEach((to, from, next) => {
-    //document.title = '努力加载中...'
+router.beforeEach((to, from, next) => {
+    /*if (_czc[from.path]) {
+        _czc.push(["_trackEvent", '停留时长(s)', '页面:', from.path, (new Date().getTime() - _czc[from.path].timeStamp)/1000] + 's')
+    }
+    _czc[to.path] = {
+        timeStamp: new Date().getTime()
+    }*/
+    _czc.push(["_trackPageview", from.path, 'http://appstore.szprize.cn/appstore/H5/storehome/#' + from.path])
     next()
-})*/
-//隐藏服务器恶意广告
+})
 //隐藏服务器恶意广告
 var adDiv1 = document.querySelector('[id^="chunasqwd"]')
 if (adDiv1) {
