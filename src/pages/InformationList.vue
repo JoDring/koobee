@@ -12,88 +12,118 @@
                             background: #fff;"
                      v-show="showScrollerMask" @click="this.showScrollerMask = false"></div>
             </transition>
-            <scroller
-                    class="list-detail"
-                    v-if="list.length"
-                    ref="scroller"
-                    :on-refresh="refresh"
-                    :on-infinite="getMore">
-                <div class="information-regions" v-show="regions && regions.length">
-                    <div @click="goToPackageList(item)" class="regions-item" v-for="item in regions" :key="item.id">
-                        <img class="regions-item-img" v-lazy="item.imageUrl">
-                        <div>{{item.title}}</div>
-                        <div class="regions-item-btn">进入</div>
-                    </div>
-                </div>
-                <div class="list-item" v-for="item in list" :key="item.id">
-                    <div class="list-item-c" @click="goToDetail(item)">
-                        <div v-lazy:background-image="{
-                        src: item.imageUrl,
-                        error:'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/gamecenter-itembg.webp',
-                        loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-                        }"
-                             class="list-item-img" v-if="onLine"></div>
-                        <div class="list-item-img" style="background: #eee" v-else></div>
-                        <div class="list-item-txt">
-                            <div class="list-item-name">{{item.title}}</div>
-                            <div class="list-item-brief">
-                                <span>{{item.hotValue || 2000}}次阅读</span>
-                                <span>{{item.timeStr | timeFormat}}</span>
+            <div style="display: flex; flex-direction: column">
+                <scroller
+                        class="list-detail"
+                        v-if="list.length"
+                        ref="scroller"
+                        :on-refresh="refresh"
+                        :on-infinite="getMore">
+                    <div class="information-regions-title">热门专区</div>
+                    <vux-scroller lock-y :scrollbar-x="false">
+                        <div :style="{width: regions.length * 100 + 'px'}" class="information-regions"
+                             v-show="regions && regions.length">
+                            <div @click="goToPackageList(item)" class="regions-item" v-for="item in regions"
+                                 :key="item.id">
+                                <img class="regions-item-img" v-lazy="item.imageUrl">
+                                <div class="regions-item-name">{{item.title}}</div>
+                                <div class="regions-item-btn">进入</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="app-info" v-if="item.app">
-                        <div class="app-info-detail" @click="openApps(item.app)">
-                            <div class="app-info-icon-c">
-                                <img class="app-info-icon"
-                                     v-lazy="item.app.largeIcon ? item.app.largeIcon : item.app.iconUrl" v-if="onLine">
-                                <img class="app-info-icon"
-                                     src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
-                                     v-else>
-                            </div>
-                            <div class="app-name-c">
-                                <div class="app-name">{{item.appName}}</div>
-                                <div class="tag">推荐</div>
+                    </vux-scroller>
+                    <div class="list-item" v-for="item in list" :key="item.id">
+                        <div class="list-item-c" @click="goToDetail(item)">
+                            <template v-if="!item.images || item.images && item.images.length <= 3">
+                                <div v-lazy:background-image="{
+                                                            src: item.imageUrl,
+                                                            error:'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/gamecenter-itembg.webp',
+                                                            loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+                                                           }"
+                                     class="list-item-img"
+                                     v-if="onLine">
+                                </div>
+                                <div class="list-item-img" style="background: #eee" v-else></div>
+                            </template>
+                            <div class="list-item-txt">
+                                <div class="list-item-name">{{item.title}}</div>
+                                <div v-if="item.images && item.images.length >= 3"
+                                     style="overflow: hidden; width: 100%; white-space: nowrap">
+                                    <div v-for="img in item.images.split(',')"
+                                         style="display: inline-block;
+                                            width: 33.333%;
+                                            margin: 5px 0 0 0;
+                                            padding: 0  1px;
+                                          box-sizing: border-box">
+                                        <div style="margin: 0; width: 100%" v-lazy:background-image="{
+                                                            src: img,
+                                                            error:'http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/gamecenter-itembg.webp',
+                                                            loading: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+                                                           }"
+                                             class="list-item-img"
+                                             v-if="onLine">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-item-brief">
+                                    <span>{{item.hotValue || 2000}}次阅读</span>
+                                    <span>{{item.timeStr | timeFormat}}</span>
+                                </div>
                             </div>
                         </div>
-                        <btn class="app-info-btn"
-                             :app="item.app"
-                             ref="appBtn"
-                             style="width: 55px;
+                        <div class="app-info" v-if="item.app">
+                            <div class="app-info-detail" @click="openApps(item.app)">
+                                <div class="app-info-icon-c">
+                                    <img class="app-info-icon"
+                                         v-lazy="item.app.largeIcon ? item.app.largeIcon : item.app.iconUrl"
+                                         v-if="onLine">
+                                    <img class="app-info-icon"
+                                         src="http://360.cooseatech.cn/appstore/H5/storehome/static/appStore/palceholder-logo.webp"
+                                         v-else>
+                                </div>
+                                <div class="app-name-c">
+                                    <div class="app-name">{{item.appName}}</div>
+                                    <div class="tag">推荐</div>
+                                </div>
+                            </div>
+                            <btn class="app-info-btn"
+                                 :app="item.app"
+                                 ref="appBtn"
+                                 style="width: 55px;
                                     height: 24px;
                                     border-radius: 12px;
                                     font-size: 12px;">
-                        </btn>
+                            </btn>
+                        </div>
+                        <div v-else style="height: 5px"></div>
+                        <div class="item-line"></div>
                     </div>
-                    <div v-else style="height: 5px"></div>
-                    <div class="item-line"></div>
-                </div>
-                <svg class="spinner" style="fill: #ff6b3b;" slot="infinite-spinner" viewBox="0 0 64 64">
-                    <g>
-                        <circle cx="16" cy="32" stroke-width="0" r="3">
-                            <animate attributeName="fill-opacity" dur="750ms" values=".5;.6;.8;1;.8;.6;.5;.5"
-                                     repeatCount="indefinite"></animate>
-                            <animate attributeName="r" dur="750ms" values="3;3;4;5;6;5;4;3"
-                                     repeatCount="indefinite"></animate>
-                        </circle>
-                        <circle cx="32" cy="32" stroke-width="0" r="3.09351">
-                            <animate attributeName="fill-opacity" dur="750ms" values=".5;.5;.6;.8;1;.8;.6;.5"
-                                     repeatCount="indefinite"></animate>
-                            <animate attributeName="r" dur="750ms" values="4;3;3;4;5;6;5;4"
-                                     repeatCount="indefinite"></animate>
-                        </circle>
-                        <circle cx="48" cy="32" stroke-width="0" r="4.09351">
-                            <animate attributeName="fill-opacity" dur="750ms" values=".6;.5;.5;.6;.8;1;.8;.6"
-                                     repeatCount="indefinite"></animate>
-                            <animate attributeName="r" dur="750ms" values="5;4;3;3;4;5;6;5"
-                                     repeatCount="indefinite"></animate>
-                        </circle>
-                    </g>
-                </svg>
-            </scroller>
-            <refresh-tip v-if="!loading && failLoaded && list.length===0"
-                         @click.native="getInformationList">
-            </refresh-tip>
+                    <svg class="spinner" style="fill: #ff6b3b;" slot="infinite-spinner" viewBox="0 0 64 64">
+                        <g>
+                            <circle cx="16" cy="32" stroke-width="0" r="3">
+                                <animate attributeName="fill-opacity" dur="750ms" values=".5;.6;.8;1;.8;.6;.5;.5"
+                                         repeatCount="indefinite"></animate>
+                                <animate attributeName="r" dur="750ms" values="3;3;4;5;6;5;4;3"
+                                         repeatCount="indefinite"></animate>
+                            </circle>
+                            <circle cx="32" cy="32" stroke-width="0" r="3.09351">
+                                <animate attributeName="fill-opacity" dur="750ms" values=".5;.5;.6;.8;1;.8;.6;.5"
+                                         repeatCount="indefinite"></animate>
+                                <animate attributeName="r" dur="750ms" values="4;3;3;4;5;6;5;4"
+                                         repeatCount="indefinite"></animate>
+                            </circle>
+                            <circle cx="48" cy="32" stroke-width="0" r="4.09351">
+                                <animate attributeName="fill-opacity" dur="750ms" values=".6;.5;.5;.6;.8;1;.8;.6"
+                                         repeatCount="indefinite"></animate>
+                                <animate attributeName="r" dur="750ms" values="5;4;3;3;4;5;6;5"
+                                         repeatCount="indefinite"></animate>
+                            </circle>
+                        </g>
+                    </svg>
+                </scroller>
+                <refresh-tip v-if="!loading && failLoaded && list.length===0"
+                             @click.native="getInformationList">
+                </refresh-tip>
+            </div>
         </div>
         <app-ad v-if="app" :app="app">
         </app-ad>
@@ -116,6 +146,8 @@
     import AppAd from '../components/AppAd'
     import {fetchInformationList} from '../services/appStore'
     import JsCallApp from '../util/JsCallApp'; //客户端api
+    import {Scroller as VuxScroller} from 'vux'
+
     export default {
         name: "information-list",
         data() {
@@ -202,7 +234,6 @@
             //根据详情分类id获取详情
             getInformationList(done, refresh) {
                 this.loading = true;
-                this.showSpinner = true
                 return fetchInformationList(this.queryData).then(res => {
                     this.successCb(res, done, refresh)
                 }, () => {
@@ -244,6 +275,7 @@
             refresh(done, refresh = true) {
                 this.queryData.pageIndex = 1
                 !this.loading && this.getInformationList(done, refresh)
+                this.$refs['scroller'] && this.$refs['scroller'].scrollTo(0, 0, false);
             },
             getMore(done) {
                 this.queryData.pageIndex++
@@ -303,7 +335,8 @@
         components: {
             Btn,
             AppAd,
-            RefreshTip
+            RefreshTip,
+            VuxScroller
         },
         filters: {
             timeFormat(data) {
@@ -327,39 +360,56 @@
         color: #222;
         display: flex;
         flex-direction: column;
+        /*热门专区*/
+        .information-regions-title {
+            font-size: 15px;
+            margin: 20-3px 0 10-3px 13px;
+            color: #3c3c3c;
+        }
         .information-regions {
-            background: #f8f8f8;
-            color: #222;
-            font-size: 17px;
+            color: #000;
+            white-space: nowrap;
+            font-size: 0;
+            position: relative;
             .regions-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                height: 100%;
-                padding: 13px;
-                color: #222;
+                background: #f4f2f0;
+                display: inline-block;
+                text-align: center;
+                width: 90px;
+                padding: 15px 0;
+                margin-left: 13px;
+                & + .regions-item {
+                    margin-left: 10px;
+                }
             }
             .regions-item-img {
-                display: block;
-                width: 60px;
-                height: 45px;
+                display: inline-block;
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
                 overflow: hidden;
-                margin-left: 7px;
                 background-size: contain;
                 background-repeat: no-repeat;
                 background-position: center;
+            }
+            .regions-item-name {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                font-size: 13px;
             }
             .regions-item-btn {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #ff6b3b;
+                background: #ff6c3a;
                 color: #fff;
                 text-align: center;
-                font-size: 12px;
+                font-size: 13px;
                 border-radius: 25px;
                 width: 55px;
                 height: 25px;
+                margin: 10-3px auto 0 auto;
             }
         }
         //-- 详情列表
@@ -397,6 +447,7 @@
 
             }
             .list-item-txt {
+                width: 100%;
                 flex: 1;
                 min-height: 65px;
                 display: flex;

@@ -17,7 +17,7 @@
     "vue": "^2.5.2",
     "vue-lazyload": "^1.2.2",
     "vue-router": "^3.0.1",
-    "vue-scroller-jodring": "^1.0.1",
+    "vue-scroller-jodring": "^1.0.3",
     "vux": "^2.7.3",
     "vux-loader": "^1.1.25"
   },

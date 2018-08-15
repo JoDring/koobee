@@ -263,6 +263,7 @@
                 display: block;
                 margin: 15px 0 25px 0;
                 max-width: 100%;
+                height: auto;
                 background: #eee;
             }
             iframe {

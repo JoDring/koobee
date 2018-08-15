@@ -5761,9 +5761,9 @@ vue-router@^3.0.1:
   version "3.0.1"
   resolved "http://registry.npm.taobao.org/vue-router/download/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
-vue-scroller-jodring@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/vue-scroller-jodring/-/vue-scroller-jodring-1.0.1.tgz#fd034c1aa2203b01b3fc37731e2caaa22fb4105a"
+vue-scroller-jodring@^1.0.3:
+  version "1.0.3"
+  resolved "http://registry.npm.taobao.org/vue-scroller-jodring/download/vue-scroller-jodring-1.0.3.tgz#7f3f8de14b8cc04cabe382349168d10856faad8f"
   dependencies:
     vue "^2.2.6"
 
