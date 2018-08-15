@@ -144,7 +144,7 @@
     import Btn from '../components/Btn'
     import RefreshTip from '../components/RefreshTip'
     import AppAd from '../components/AppAd'
-    import {fetchInformationList} from '../services/appStore'
+    import {fetchInformationListV2} from '../services/appStore'
     import JsCallApp from '../util/JsCallApp'; //客户端api
     import {Scroller as VuxScroller} from 'vux'
 
@@ -234,7 +234,7 @@
             //根据详情分类id获取详情
             getInformationList(done, refresh) {
                 this.loading = true;
-                return fetchInformationList(this.queryData).then(res => {
+                return fetchInformationListV2(this.queryData).then(res => {
                     this.successCb(res, done, refresh)
                 }, () => {
                     this.failCb(done)
@@ -286,7 +286,7 @@
                     return v.id !== item.id
                 })
                 this.$router.push({
-                        name: 'InformationDetail',
+                        name: 'InformationDetailV2',
                         append: false,
                         params: {
                             id: item.id,
@@ -302,7 +302,7 @@
             },
             goToPackageList(item) {
                 this.$router.push({
-                    name: 'InformationList',
+                    name: 'InformationListV2',
                     params: {title: item.title},
                     query: {packageName: item.packageName}
                 })

@@ -11,7 +11,9 @@ const AppStoreCategory = () => import(/* webpackChunkName: "appStore" */ '../pag
 const AppStoreApps = () => import(/* webpackChunkName: "appStore" */ '../pages/AppStoreApps.vue');
 
 const InformationList = () => import(/* webpackChunkName: "information" */ '../pages/InformationList.vue');
+const InformationListV2 = () => import(/* webpackChunkName: "information" */ '../pages/InformationListV2.vue');
 const InformationDetail = () => import(/* webpackChunkName: "information" */ '../pages/InformationDetail.vue');
+const InformationDetailV2 = () => import(/* webpackChunkName: "information" */ '../pages/InformationDetailV2.vue');
 
 export default new Router({
     routes: [
@@ -60,6 +62,20 @@ export default new Router({
             path: '/InformationDetail/:id',
             name: 'InformationDetail',
             component: InformationDetail,
+            meta:{title: '资讯详情'},
+            props: true
+        },
+        {
+            path: '/InformationListV2',
+            name: 'InformationListV2',
+            component: InformationListV2,
+            meta:{title: '热门资讯'},
+            props: true
+        },
+        {
+            path: '/InformationDetailV2/:id',
+            name: 'InformationDetailV2',
+            component: InformationDetailV2,
             meta:{title: '资讯详情'},
             props: true
         },

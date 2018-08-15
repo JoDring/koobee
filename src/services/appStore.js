@@ -76,6 +76,13 @@ export function fetchSearchHotWords() {
 // ---资讯
 export function fetchInformationList(params) {
     return request({
+        url:'appstore/html/api/information/list',
+        method: 'get',
+        params
+    })
+}
+export function fetchInformationListV2(params) {
+    return request({
         url:'appstore/html/api/information/list/v2',
         method: 'get',
         params
