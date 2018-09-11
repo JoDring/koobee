@@ -19,7 +19,6 @@
                         ref="scroller"
                         :on-refresh="refresh"
                         :on-infinite="getMore">
-                    <div class="information-regions-title">热门专区</div>
                     <vux-scroller lock-y :scrollbar-x="false">
                         <div :style="{width: regions.length * 100 + 'px'}" class="information-regions"
                              v-show="regions && regions.length">
