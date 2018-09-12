@@ -2,10 +2,9 @@ import Router from 'vue-router';
 
 import NotFound from  '../pages/NotFound.vue';
 import Lottery from '../pages/Lottery.vue';
-import LotteryYuandan2017 from '../pages/Lottery-yuandan2017.vue';
+const LotteryYuandan2017 = () => import('../pages/Lottery-yuandan2017.vue');
 const LotteryChunjie2018 = () => import('../pages/Lottery-chunjie2018.vue');
-
-import Wuyi2018 from '../pages/Lottery-wuyi2018.vue';
+const Wuyi2018 = () => import('../pages/Lottery-wuyi2018.vue');
 
 export default new Router({
     routes: [
@@ -37,7 +36,13 @@ export default new Router({
                     name: 'Wuyi2018',
                     component: Wuyi2018,
                     props: true
-                }
+                },
+                {
+                    path: 'zhongqiu2018',
+                    name: 'zhongqiu2018',
+                    component: () => import('../pages/Lottery-zhongqiu2018.vue'),
+                    props: true
+                },
             ]
         },
         {

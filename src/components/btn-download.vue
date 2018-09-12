@@ -193,10 +193,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: normal;
+        line-height: .7rem;
     }
 
     /*元旦2017*/
@@ -288,6 +285,57 @@
             background-image: url("../../static/images/lottery/wuyi2018/btn-gray.webp");
             .process-bg-img {
                 background-image: url("../../static/images/lottery/wuyi2018/btn-gray.webp");
+            }
+        }
+    }
+
+    /*中秋2018*/
+    .weui-btn.zhongqiu2018 {
+        width: (110/@rem)*1rem;
+        height: (48/@rem)*1rem;
+        line-height: 1.2;
+        border-radius: (24/@rem)*1rem;
+        font-size: (24/@rem)*1rem;
+        white-space: nowrap;
+        border: none;
+        padding: 0;
+        background: url("../../static/images/lottery/zhongqiu2018/btn-bg.webp") no-repeat;
+        background-size: cover;
+        left: (7/@rem)*1rem;
+        &:active {
+            border-color: transparent;
+            &::after {
+                border: none;
+                background-color: transparent;
+            }
+        }
+        &.weui-btn_plain-primary {
+            border: none;
+            background-image: url("../../static/images/lottery/zhongqiu2018/btn-bg.webp");
+            overflow: hidden;
+        }
+        .process-bg {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+        }
+        .process-bg-img {
+            width: 100%;
+            height: 100%;
+            background: url("../../static/images/lottery/zhongqiu2018/btn-light.webp") no-repeat;
+            background-size: cover;
+        }
+        .process-text {
+            color: #fff;
+        }
+        &::after {
+            border: none;
+        }
+        //已经抽奖
+        &.hasAward {
+            background-image: url("../../static/images/lottery/zhongqiu2018/btn-gray.webp");
+            .process-bg-img {
+                background-image: url("../../static/images/lottery/zhongqiu2018/btn-gray.webp");
             }
         }
     }
