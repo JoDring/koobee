@@ -679,29 +679,31 @@
             },
             //下载所有
             handleDownloadAll() {
-                if (this.userInfo.userId && !this.showDrawBtn) {
-                    this.apps.forEach((v) => {
-                        let appStatus = JsCallApp.getAppStatus(v.packageName, v.id, v.versionCode);
-                        if (appStatus == appState.FINAL_DOWNLOAD || appStatus == appState.FINAL_PAUSE) {
-                            JsCallApp.handleAppAction(JSON.stringify(v), 'download');
-                            this.apps = this.apps.map(m => {
-                                if (v.id === m.id) {
-                                    return {
-                                        ...m,
-                                        istatus: 2,
+                if (this.userInfo.userId) {
+                    if (!this.showDrawBtn) {
+                        this.apps.forEach((v) => {
+                            let appStatus = JsCallApp.getAppStatus(v.packageName, v.id, v.versionCode);
+                            if (appStatus == appState.FINAL_DOWNLOAD || appStatus == appState.FINAL_PAUSE) {
+                                JsCallApp.handleAppAction(JSON.stringify(v), 'download');
+                                this.apps = this.apps.map(m => {
+                                    if (v.id === m.id) {
+                                        return {
+                                            ...m,
+                                            istatus: 2,
+                                        }
+                                    } else {
+                                        return m;
                                     }
-                                } else {
-                                    return m;
-                                }
-                            });
-                        }
-                    });
-                    this.setCacheAppsAction(this.apps);
-                    window.MtaH5 && window.MtaH5.clickStat('activity_click_dowloadall', {
-                        'activityid': this.detail.id,
-                        'userphone': this.userInfo.phone,
-                        'userid': this.userInfo.userId
-                    });
+                                });
+                            }
+                        });
+                        this.setCacheAppsAction(this.apps);
+                        window.MtaH5 && window.MtaH5.clickStat('activity_click_dowloadall', {
+                            'activityid': this.detail.id,
+                            'userphone': this.userInfo.phone,
+                            'userid': this.userInfo.userId
+                        });
+                    }
                 } else {
                     window.jsObj && JsCallApp.jumpToLogin();
                 }
@@ -1022,7 +1024,7 @@
                 this.clickTimes++;
                 if (this.clickTimes === 6) {
                     localStorage.clear();
-                    clearTestCache({activityId : this.id}).then(() => {
+                    clearTestCache({activityId: this.id}).then(() => {
                         window.jsObj && JsCallApp.alertAToast('reset done!');
                         this.clickTimes = 0;
                         window.location.reload();
