@@ -19,6 +19,7 @@
             </marquee>
             <button @click="handleDownloadAll"
                     class="weui-btn btn-download-all">
+                <span v-if="showDrawBtn" class="btn-login btn-draw"></span>
                 <span v-if="!(userInfo && userInfo.userId)" class="btn-login"></span>
             </button>
             <div class="app-list" v-if="apps.length > 0">
@@ -181,7 +182,8 @@
         Alert,
         XImg,
 //    querystring,
-        TransferDomDirective as TransferDom
+        TransferDomDirective as TransferDom,
+        debounce
     } from 'vux';
     import reduce from 'lodash/reduce';
     import pickBy from 'lodash/pickBy';
@@ -203,7 +205,7 @@
     //  localStorage.removeItem('lotteryAppsAction');
     //  localStorage.removeItem('lotteryUerInput');
     //  localStorage.removeItem('lotteryLastAward');
-    //    localStorage.clear();
+    //  localStorage.clear();
     export default {
         name: 'lottery-zhongqiu2018',
         data() {
@@ -232,7 +234,8 @@
                 },
                 clickTimes: 0,
                 loadFormBg: false,
-                onLine: window.navigator.onLine
+                onLine: window.navigator.onLine,
+                showDrawBtn: true,
             }
         },
         props: {
@@ -256,51 +259,7 @@
             })(window);
         },
         created() {
-            //所有初始化要等获得数据后
-            this.fetchData().then(() => {
-                document.title = this.detail.title || '无标题活动';
-                //曝光全局方法 给客户端调用
-                window.javaCallJsChangeStatus = this.changeState.bind(this);
-                window.downloadBtnClickCallBack = this.changeState.bind(this);
-                window.requestServerByAsyncCallBack = (type, status, json) => {
-                };
-                window.loginSuccessCallBack = (res) => {
-                    this.userInfo = this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo());
-                };
-                window.javaCallJsExitOutSwitch = () => {
-                    this.recordsTimer && window.clearInterval(this.recordsTimer);
-                    this.setCacheAppsAction(this.apps);
-                    // 弹框未完成输入缓存, 未放弃领奖
-                    if ((this.showDialogType === 'form-big' || this.showDialogType === 'form-sm') && !this.userInput.hasAbandon) {
-                        this.setCacheUserInput();
-                    }
-//          window.jsObj && JsCallApp.transferParam('exitOut');
-                    /*if (window.isEditing) {
-                      JsCallApp.transferParam('stopExitOut');
-                    } else {
-                      JsCallApp.transferParam('exitOut');
-                    }*/
-                };
-
-                /*轮询获取中奖广播*/
-                if (String(this.detail.istatus) === '0') {
-                    this.recordsTimer = setInterval(() => {
-                        fetchLotteryRecords({id: this.id}).then(res => {
-                            if (String(res.code) === '0') {
-                                this.records = res.data.records;
-                            }
-                        });
-                    }, 25000);
-                    //上次未领的奖品
-                    /*this.userInput = this.getCacheUserInput() || this.userInput;
-                    if (this.userInput && (this.userInput.showDialogType === 'form-big' || this.userInput.showDialogType === 'form-sm') && !this.userInput.hasSubmit && !this.userInput.hasAbandon) {
-                      this.showDialog = true;
-                    }*/
-                }
-                //init page state
-                window.jsObj && this.changeState();
-                window.MtaH5 && window.MtaH5.clickStat('loaded_activity_' + this.detail.id);
-            });
+            this.appInit()
             window.jsObj && (this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo()) || {});
             this.$vux.bus.$on('off-line', () => {
                 this.onLine = false
@@ -308,6 +267,15 @@
             this.$vux.bus.$on('on-line', () => {
                 this.onLine = true
             })
+        },
+        mounted() {
+            //检测滚动距离
+            const lotteryDOM = document.querySelector('.lottery')
+            lotteryDOM.addEventListener('scroll', debounce(() => {
+                if (lotteryDOM.scrollTop >= 430) {
+                    this.showDrawBtn = false
+                }
+            }, 1000))
         },
         methods: {
             fetchData() {
@@ -379,8 +347,57 @@
                     }
                     this.loadFormBg = true
                 }, () => {
+                    window.jsObj && JsCallApp.alertAToast('服务器繁忙, 请稍后再试!');
                     document.title = '网络出错了, 可尝试重进';
                 })
+            },
+            appInit() {
+                //所有初始化要等获得数据后
+                this.fetchData().then(() => {
+                    document.title = this.detail.title || '无标题活动';
+                    //曝光全局方法 给客户端调用
+                    window.javaCallJsChangeStatus = this.changeState.bind(this);
+                    window.downloadBtnClickCallBack = this.changeState.bind(this);
+                    window.requestServerByAsyncCallBack = (type, status, json) => {
+                    };
+                    window.loginSuccessCallBack = (res) => {
+                        this.userInfo = this.userInfo = JSON.parse(JsCallApp.getUserLoginInfo());
+                    };
+                    window.javaCallJsExitOutSwitch = () => {
+                        this.recordsTimer && window.clearInterval(this.recordsTimer);
+                        this.recordsTimer = 0
+                        this.setCacheAppsAction(this.apps);
+                        // 弹框未完成输入缓存, 未放弃领奖
+                        if ((this.showDialogType === 'form-big' || this.showDialogType === 'form-sm') && !this.userInput.hasAbandon) {
+                            this.setCacheUserInput();
+                        }
+                        // window.jsObj && JsCallApp.transferParam('exitOut');
+                        /*if (window.isEditing) {
+                          JsCallApp.transferParam('stopExitOut');
+                        } else {
+                          JsCallApp.transferParam('exitOut');
+                        }*/
+                    };
+
+                    /*轮询获取中奖广播*/
+                    if (String(this.detail.istatus) === '0' && !this.recordsTimer) {
+                        this.recordsTimer = setInterval(() => {
+                            fetchLotteryRecords({id: this.id}).then(res => {
+                                if (String(res.code) === '0') {
+                                    this.records = res.data.records;
+                                }
+                            });
+                        }, 15000);
+                        //上次未领的奖品
+                        /*this.userInput = this.getCacheUserInput() || this.userInput;
+                        if (this.userInput && (this.userInput.showDialogType === 'form-big' || this.userInput.showDialogType === 'form-sm') && !this.userInput.hasSubmit && !this.userInput.hasAbandon) {
+                          this.showDialog = true;
+                        }*/
+                    }
+                    //init page state
+                    window.jsObj && this.changeState();
+                    window.MtaH5 && window.MtaH5.clickStat('loaded_activity_' + this.detail.id);
+                });
             },
             handleImgClick(app) {
                 //window.jsObj && this.jumpToDetail(app);
@@ -662,7 +679,7 @@
             },
             //下载所有
             handleDownloadAll() {
-                if (this.userInfo.userId) {
+                if (this.userInfo.userId && !this.showDrawBtn) {
                     this.apps.forEach((v) => {
                         let appStatus = JsCallApp.getAppStatus(v.packageName, v.id, v.versionCode);
                         if (appStatus == appState.FINAL_DOWNLOAD || appStatus == appState.FINAL_PAUSE) {
@@ -1004,9 +1021,8 @@
             clearCache() {
                 this.clickTimes++;
                 if (this.clickTimes === 6) {
-                    alert(2323)
                     localStorage.clear();
-                    clearTestCache().then(() => {
+                    clearTestCache({activityId : this.id}).then(() => {
                         window.jsObj && JsCallApp.alertAToast('reset done!');
                         this.clickTimes = 0;
                         window.location.reload();
@@ -1136,6 +1152,9 @@
             background-image: url("../../static/images/lottery/zhongqiu2018/btn-login2.webp");
             background-size: 100%;
             background-repeat: no-repeat;
+            &.btn-draw {
+                background-image: url("../../static/images/lottery/zhongqiu2018/btn-draw.webp");
+            }
         }
         .lottery-rule {
             position: absolute;

@@ -1,9 +1,10 @@
 import request from '../util/request'
 // ---抽奖
-export function clearTestCache() {
+export function clearTestCache(params) {
     return request({
-        url:'/appstore/record/clear',
-        method: 'get'
+        url:'/appstore/activity/clear',
+        method: 'get',
+        params,
     })
 }
 export function fetchLotteryDetail(params) {
