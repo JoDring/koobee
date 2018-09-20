@@ -681,10 +681,17 @@
             handleDownloadAll() {
                 if (this.userInfo.userId) {
                     if (!this.showDrawBtn) {
-                        this.apps.forEach((v) => {
+                        const needDownApps = []
+                        this.apps.reverse().forEach((v) => {
+                            // bug: 提示(正在用手机流量)弹框会阻止app下载操作
                             let appStatus = JsCallApp.getAppStatus(v.packageName, v.id, v.versionCode);
                             if (appStatus == appState.FINAL_DOWNLOAD || appStatus == appState.FINAL_PAUSE) {
-                                JsCallApp.handleAppAction(JSON.stringify(v), 'download');
+                                if (window.jsObj && window.jsObj.jsCallHOneKeyDown) {
+                                    needDownApps.push(v)
+                                } else {
+                                    JsCallApp.handleAppAction(JSON.stringify(v), 'download');
+                                }
+                                // 下载后必可领取
                                 this.apps = this.apps.map(m => {
                                     if (v.id === m.id) {
                                         return {
@@ -696,7 +703,11 @@
                                     }
                                 });
                             }
-                        });
+                        })
+                        console.log(needDownApps)
+                        if (needDownApps.length) {
+                            window.jsObj.jsCallHOneKeyDown(Json.stringify(needDownApps))
+                        }
                         this.setCacheAppsAction(this.apps);
                         window.MtaH5 && window.MtaH5.clickStat('activity_click_dowloadall', {
                             'activityid': this.detail.id,

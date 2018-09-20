@@ -3,6 +3,18 @@
  */
 const JsCallApp = (function(){
 
+    /**
+     * 这里处理提示用户升级应用市场的信息
+     */
+    function showUpdateAppstoreNotice(){
+        if(!window.jsObj || !window.jsObj.jsCallConfirmText){
+            // alert('请先升级应用市场再打开此页面');
+            // showDialog('请先升级应用市场到最新版本再参与活动哟，进入【设置】-【关于】-【版本更新】','确定');
+        }else{
+            window.jsObj.jsCallConfirmText('请先升级应用市场到最新版本再参与活动哟，进入【设置】-【关于】-【版本更新】', 'jumpToAppstoreUpdate()');
+        }
+    }
+
 	/**
 	 * 打开app
 	 */
@@ -167,17 +179,6 @@ const JsCallApp = (function(){
 		return window.jsObj.jsCallIsSystemAppstore();
 	}
 
-	/**
-	 * 这里处理提示用户升级应用市场的信息
-	 */
-	function showUpdateAppstoreNotice(){
-		if(!window.jsObj || !window.jsObj.jsCallConfirmText){
-			// alert('请先升级应用市场再打开此页面');
-			// showDialog('请先升级应用市场到最新版本再参与活动哟，进入【设置】-【关于】-【版本更新】','确定');
-		}else{
-			window.jsObj.jsCallConfirmText('请先升级应用市场到最新版本再参与活动哟，进入【设置】-【关于】-【版本更新】', 'jumpToAppstoreUpdate()');
-		}
-	}
 
 	/**
 	* 这里选择下载、安装、打开 app的操作
@@ -187,6 +188,16 @@ const JsCallApp = (function(){
 			showUpdateAppstoreNotice();
 		}
 		return window.jsObj.jsCallHandleAppAction(appJson, action);
+	}
+
+	/**
+	* 下载数组所有app
+	*/
+	function oneKeyDown(apps = []){
+		if(!window.jsObj || !window.jsObj.jsCallHOneKeyDown){
+			showUpdateAppstoreNotice();
+		}
+		return window.jsObj.jsCallHOneKeyDown(Json.stringify(apps));
 	}
 
 	/**
@@ -223,11 +234,12 @@ const JsCallApp = (function(){
 		jumpToLogin, //跳转致登录
 		checkLogin, //检测登录状态
 		handleAppAction,  //这里选择下载、安装、打开 app的操作
-		isSystemAppstore, //判断是不是系统或三方版本
-		requestServerByAsync,  //代理加密请求  异步
-		transferParam, //单纯将参数传递致客户端app
-		showUpdateAppstoreNotice, //弹窗更新
-        getApplicationName //获取当前应用appstore  gamecenter
+        oneKeyDown, //下载数组所有
+        isSystemAppstore, //判断是不是系统或三方版本
+        requestServerByAsync,  //代理加密请求  异步
+        transferParam, //单纯将参数传递致客户端app
+        showUpdateAppstoreNotice, //弹窗更新
+        getApplicationName, //获取当前应用appstore  gamecenter
 	};
 })();
 
